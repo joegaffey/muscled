@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>MUlti-SCreen Layout EDitor</title>
+    <style>
+      body {
+        margin: 0;
+      }
+    </style>
+    <script
+      async
+      src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"
+    ></script>
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "./lib/three.module.js",
+          "orbitControls": "./lib/OrbitControls.js",
+          "firstPersonControls": "./lib/FirstPersonControls.js",
+          "stlLoader": "./lib/STLLoader.js",
+          "screen": "./screen.js"
+        }
+      }
+    </script>
+    <script type="text/javascript" src="./lib/dat.gui.min.js"></script>
+  </head>
+  <body>
+    <script type="module">
+      import * as THREE from "three";
+      import { OrbitControls } from "orbitControls";
+      import { FirstPersonControls } from "firstPersonControls";
+      import STLLoader from "stlLoader";
+      import Screen from "screen";
+
+      const gui = new dat.GUI();
+
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(
+        75,
+        window.innerWidth / window.innerHeight,
+        0.1,
+        1000
+      );
+      let currentCam = camera;
+
+      const fpCamera = new THREE.PerspectiveCamera(
+        60,
+        window.innerWidth / window.innerHeight,
+        1,
+        10000
+      );
+
+      const renderer = new THREE.WebGLRenderer();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      document.body.appendChild(renderer.domElement);
+
+      let controls = new OrbitControls(camera, renderer.domElement);
+
+      const wireMaterial = new THREE.MeshBasicMaterial({
+        color: 0x88ff88,
+        transparent: true,
+        opacity: 0.25,
+      });
+      const cdnPath =
+        "https://cdn.glitch.global/710b4225-853b-4ba5-bd3d-1a005f44407d/";
+      const backgrounds = {
+        left: cdnPath + "mistyroad_w1920_cw1920_ch1080_cx0_cy0.jpg",
+        middle: cdnPath + "mistyroad_w1920_cw1920_ch1080_cx1920_cy0.jpg",
+        right: cdnPath + "mistyroad_w1920_cw1920_ch1080_cx0_cy0.jpg",
+      };
+
+      const img = "wallpaper.jpg";
+      const sf = 0.75;
+
+      // prettier-ignore
+      const sizes = { 
+        '19 4x3': { width: 19*sf, height:  19*sf/4*3, angle: 0.9, spacing: 11.5, centerOffset: -5.5, floorHeight: 26, z: 9 },
+        // '19 16x9': { width: 16, height: 9, angle: 1.13, spacing: 23, centerOffset: -15, floorHeight: 26, z: 19 },
+        // '20 4x3': { width: 32, height: 18, angle: 1.13, spacing: 23, centerOffset: -15, floorHeight: 26, z: 19 },
+        // '20 16x9': { width: 32, height: 18, angle: 1.13, spacing: 23, centerOffset: -15, floorHeight: 26, z: 19 },
+        // '21 16x9': { width: 32, height: 18, angle: 1.13, spacing: 23, centerOffset: -15, floorHeight: 26, z: 19 },
+        // '22 16x9': { width: 32, height: 18, angle: 1.13, spacing: 23, centerOffset: -15, floorHeight: 26, z: 19 },
+        '24 16x9': { width: 24*sf, height: 24*sf/16*9, angle: 1.13, spacing: 13, centerOffset: -8, floorHeight: 26, z: 11 },
+        // '25 21x9': { width: 32, height: 18, angle: 1.13, spacing: 23, centerOffset: -15, floorHeight: 26, z: 19 },
+        '27 16x9': { width: 27*sf, height: 27*sf/16*9, angle: 1.13, spacing: 14.5, centerOffset: -9, floorHeight: 26, z: 14 },
+        // '28 16x9': { width: 32, height: 18, angle: 1.13, spacing: 23, centerOffset: -15, floorHeight: 26, z: 19 },
+        // '29 21x9': { width: 32, height: 18, angle: 1.13, spacing: 23, centerOffset: -15, floorHeight: 26, z: 19 },
+        // '30 16x9': { width: 32, height: 18, angle: 1.13, spacing: 23, centerOffset: -15, floorHeight: 26, z: 19 },
+        '32 16x9': { width: 32*sf, height: 32*sf/16*9, angle: 1.13, spacing: 17, centerOffset: -11, floorHeight: 26, z: 14 },
+        // '34 21x9': { width: 32, height: 18, angle: 1.13, spacing: 23, centerOffset: -15, floorHeight: 26, z: 19 },
+        // '40 16x9': { width: 32, height: 18, angle: 1.13, spacing: 23, centerOffset: -15, floorHeight: 26, z: 19 },
+        '42 16x9': { width: 42*sf, height: 42*sf/16*9, angle: 1.13, spacing: 22.5, centerOffset: -14.5, floorHeight: 26, z: 17 },
+        // '49 16x9': { width: 32, height: 18, angle: 1.13, spacing: 23, centerOffset: -15, floorHeight: 26, z: 19 },
+        // '55 16x9': { width: 32, height: 18, angle: 1.13, spacing: 23, centerOffset: -15, floorHeight: 26, z: 19 },
+        // '65 16x9': { width: 32, height: 18, angle: 1.13, spacing: 23, centerOffset: -15, floorHeight: 26, z: 19 },
+        // '75 16x9': { width: 32, height: 18, angle: 1.13, spacing: 23, centerOffset: -15, floorHeight: 26, z: 19 },
+      }
+
+      const camTarget = [0, 15, 0];
+
+      const cams = {
+        leftShoulder: { type: "orbit", pos: [-20, 25, 55], target: camTarget },
+        rightShoulder: { type: "orbit", pos: [20, 25, 55], target: camTarget },
+        top: { type: "orbit", pos: [0, 80, 20], target: [0, 0, 20] },
+        // driver: { type: 'fp', pos: [0, 30, 35], target: camTarget }
+      };
+      setCamera(Object.values(cams)[0]);
+
+      const screen1 = new Screen(backgrounds.left);
+      const screen2 = new Screen(backgrounds.middle);
+      const screen3 = new Screen(backgrounds.right);
+
+      scene.add(screen1);
+      scene.add(screen2);
+      scene.add(screen3);
+
+      let screens = {
+        wireframe: false,
+        size: "27 16x9",
+      };
+      setScreenSize(sizes[screens.size]);
+
+      const screenGUI = gui.addFolder("Screens");
+      screenGUI.add(screens, "size", Object.keys(sizes)).onChange((value) => {
+        setScreenSize(sizes[value]);
+      });
+      screenGUI.add(screens, "angle", 0, 1.8);
+      screenGUI.add(screens, "spacing", 0, 80);
+      screenGUI.add(screens, "floorHeight", 0, 50);
+      screenGUI.add(screens, "z", -10, 40);
+      screenGUI.add(screens, "centerOffset", -30, 20);
+      screenGUI.add(screens, "wireframe");
+
+      const camGUI = gui.addFolder("Camera");
+      const camSelect = { camera: Object.keys(cams)[0] };
+      camGUI.add(camSelect, "camera", Object.keys(cams)).onChange((value) => {
+        setCamera(cams[value]);
+      });
+
+      camGUI.add(camera.position, "x", -40, 40);
+      camGUI.add(camera.position, "y", -40, 40);
+      camGUI.add(camera.position, "z", -40, 80);
+
+      const rigModelPath =
+        "https://cdn.glitch.global/710b4225-853b-4ba5-bd3d-1a005f44407d/rig3.stl?v=1649761557874";
+      let rig = null;
+
+      const stlLoader = new STLLoader();
+      stlLoader.load(
+        rigModelPath,
+        function (geometry) {
+          const mesh = new THREE.Mesh(geometry, wireMaterial);
+          mesh.rotation.x = -Math.PI / 2;
+          mesh.rotation.z = Math.PI / 2;
+          mesh.position.x = 12;
+          mesh.position.z = 40;
+          scene.add(mesh);
+          rig = mesh;
+          const rigGUI = gui.addFolder("Rig");
+          rigGUI.add(rig.position, "z", -20, 80);
+        },
+        (xhr) => {
+          console.log((xhr.loaded / xhr.total) * 100 + "% loaded");
+        },
+        (error) => {
+          console.log(error);
+        }
+      );
+
+      function setScreenSize(size) {
+        screens.angle = size.angle;
+        screens.spacing = size.spacing;
+        screens.centerOffset = size.centerOffset;
+        screens.floorHeight = size.floorHeight;
+        screens.z = size.z;
+        screen1.setSize(size);
+        screen2.setSize(size);
+        screen3.setSize(size);
+        gui.updateDisplay();
+      }
+
+      function setCamera(cam) {
+        if (cam.type === "orbit") {
+          controls = new OrbitControls(camera, renderer.domElement);
+          camera.position.set(...cam.pos);
+          controls.target.set(...cam.target);
+          currentCam = camera;
+        } else if (cam.type === "fp") {
+          controls = new FirstPersonControls(fpCamera, renderer.domElement);
+          controls.movementSpeed = 150;
+          controls.lookSpeed = 0.1;
+          fpCamera.position.set(...cam.pos);
+          fpCamera.lookAt(...cam.target);
+          currentCam = fpCamera;
+        }
+        controls.update();
+      }
+
+      function animate() {
+        screen1.rotation.y = screens.angle * -1;
+        screen3.rotation.y = screens.angle;
+
+        screen1.position.set(screens.spacing, screens.floorHeight, screens.z);
+        screen3.position.set(-screens.spacing, screens.floorHeight, screens.z);
+
+        screen2.position.set(
+          0,
+          screens.floorHeight,
+          screens.z + screens.centerOffset
+        );
+
+        if (!screens.wireframe) {
+          screen1.material = screen1.defaultMaterial;
+          screen2.material = screen2.defaultMaterial;
+          screen3.material = screen3.defaultMaterial;
+        } else
+          screen1.material = screen2.material = screen3.material = wireMaterial;
+
+        requestAnimationFrame(animate);
+        renderer.render(scene, currentCam);
+      }
+      animate();
+
+      window.addEventListener("resize", onWindowResize, false);
+
+      function onWindowResize() {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      }
+    </script>
+  </body>
+</html>
