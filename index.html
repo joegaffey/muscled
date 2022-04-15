@@ -2,6 +2,7 @@
 <html>
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MUlti-SCreen Layout EDitor</title>
     <style>
       body {
@@ -64,11 +65,17 @@
       });
       const cdnPath =
         "https://cdn.glitch.global/710b4225-853b-4ba5-bd3d-1a005f44407d/";
+      // const backgrounds = {
+      //   left: cdnPath + "mistyroad_w1920_cw1920_ch1080_cx0_cy0.jpg",
+      //   middle: cdnPath + "mistyroad_w1920_cw1920_ch1080_cx1920_cy0.jpg",
+      //   right: cdnPath + "mistyroad_w1920_cw1920_ch1080_cx0_cy0.jpg",
+      // };
+      
       const backgrounds = {
-        left: cdnPath + "mistyroad_w1920_cw1920_ch1080_cx0_cy0.jpg",
-        middle: cdnPath + "mistyroad_w1920_cw1920_ch1080_cx1920_cy0.jpg",
-        right: cdnPath + "mistyroad_w1920_cw1920_ch1080_cx0_cy0.jpg",
-      };
+        left: cdnPath + "racing1.jpg",
+        middle: cdnPath + "racing1.jpg",
+        right: cdnPath + "racing1.jpg",
+      };      
 
       const img = "wallpaper.jpg";
       const sf = 0.75;
@@ -98,6 +105,10 @@
       const screen1 = new Screen(backgrounds.left);
       const screen2 = new Screen(backgrounds.middle);
       const screen3 = new Screen(backgrounds.right);
+      
+      screen1.setImageOffset(0.66);
+      screen2.setImageOffset(0.33);
+      screen3.setImageOffset(0);
 
       scene.add(screen1);
       scene.add(screen2);
