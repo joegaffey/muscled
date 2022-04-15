@@ -19,8 +19,13 @@ export default class Screen extends THREE.Mesh {
       new THREE.MeshBasicMaterial({ map: loader.load(background) }),
       plasticMaterial,
     ];
-
     this.defaultMaterial = this.materials;
+  }
+  
+  setImageOffset(offset) {
+    const texture = this.materials[4].map;
+    texture.repeat.x = 0.333;
+    texture.offset.x = offset
   }
 
   setSize(size) {
