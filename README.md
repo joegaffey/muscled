@@ -1,4 +1,4 @@
-# Multi-Screen Layout Editor
+# Multi-Screen Layout EDitor
 
 The MUlti-SCreen Layout EDitor provides a 3D workspace to layout and assess the design of your multi-screen envrionment. 
 
