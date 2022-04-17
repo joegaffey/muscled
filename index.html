@@ -34,6 +34,7 @@
           "orbitControls": "./lib/OrbitControls.js",
           "flyControls": "/lib/FlyControls.js",
           "stlLoader": "./lib/STLLoader.js",
+          "vrButton": "./lib/VRButton.js",
           "screen": "./screen.js"
         }
       }
@@ -50,6 +51,7 @@
       import { FlyControls } from "flyControls";
       import STLLoader from "stlLoader";
       import Screen from "screen";
+      // import { VRButton } from "vrButton";
 
       const gui = new dat.GUI();
       
@@ -80,6 +82,9 @@
       const renderer = new THREE.WebGLRenderer();
       renderer.setSize(window.innerWidth, window.innerHeight);
       document.body.appendChild(renderer.domElement);
+      
+      // renderer.xr.enabled = true;
+      // document.body.appendChild(VRButton.createButton(renderer));
 
       const orbControls = new OrbitControls(orbCamera, renderer.domElement);
       const flyControls = new FlyControls(flyCamera, renderer.domElement);
@@ -252,15 +257,17 @@
           screen1.material = screen1.defaultMaterial;
           screen2.material = screen2.defaultMaterial;
           screen3.material = screen3.defaultMaterial;
-        } else
+        } else 
           screen1.material = screen2.material = screen3.material = wireMaterial;
 
-        requestAnimationFrame(animate);
         if(currentCam === flyCamera)
           flyControls.update(1);
         renderer.render(scene, currentCam);
       }
-      animate();
+      
+      renderer.setAnimationLoop(() => {
+        animate();
+      });
 
       window.addEventListener("resize", onWindowResize, false);
 
