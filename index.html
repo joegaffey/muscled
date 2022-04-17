@@ -122,14 +122,23 @@
       };
       setCamera(Object.values(cams)[0]);
 
-      const screen1 = new Screen(backgrounds.left);
-      const screen2 = new Screen(backgrounds.middle);
-      const screen3 = new Screen(backgrounds.right);
       
-      screen1.setImageOffset(0.66);
-      screen2.setImageOffset(0.33);
-      screen3.setImageOffset(0);
+//       const screen1 = new Screen();
+//       const screen2 = new Screen();
+//       const screen3 = new Screen();
+      
+//       screen1.setImage(backgrounds.left);
+//       screen2.setImage(backgrounds.middle);
+//       screen3.setImage(backgrounds.right);
 
+//       screen1.setImageOffset(0.66);
+//       screen2.setImageOffset(0.33);
+//       screen3.setImageOffset(0);
+      
+      const screen1 = new Screen(backgrounds.left, 0.66);
+      const screen2 = new Screen(backgrounds.middle, 0.33);
+      const screen3 = new Screen(backgrounds.right, 0);
+      
       scene.add(screen1);
       scene.add(screen2);
       scene.add(screen3);
@@ -161,8 +170,7 @@
       camGUI.add(camera.position, "y", -40, 40);
       camGUI.add(camera.position, "z", -40, 80);
 
-      const rigModelPath =
-        "https://cdn.glitch.global/710b4225-853b-4ba5-bd3d-1a005f44407d/rig3.stl?v=1649761557874";
+      const rigModelPath = cdnPath + "rig3.stl";
       let rig = null;
 
       const stlLoader = new STLLoader();
