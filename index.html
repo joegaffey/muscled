@@ -32,7 +32,7 @@
         "imports": {
           "three": "./lib/three.module.js",
           "orbitControls": "./lib/OrbitControls.js",
-          "firstPersonControls": "./lib/FirstPersonControls.js",
+          "flyControls": "/lib/FlyControls.js",
           "stlLoader": "./lib/STLLoader.js",
           "screen": "./screen.js"
         }
@@ -47,7 +47,7 @@
     <script type="module">
       import * as THREE from "three";
       import { OrbitControls } from "orbitControls";
-      import { FirstPersonControls } from "firstPersonControls";
+      import { FlyControls } from "flyControls";
       import STLLoader from "stlLoader";
       import Screen from "screen";
 
@@ -57,26 +57,35 @@
       const loaderEl = document.querySelector(".loader");
 
       const scene = new THREE.Scene();
-      const camera = new THREE.PerspectiveCamera(
+      const orbCamera = new THREE.PerspectiveCamera(
         75,
         window.innerWidth / window.innerHeight,
         0.1,
         1000
       );
-      let currentCam = camera;
-
-      const fpCamera = new THREE.PerspectiveCamera(
+      
+      const flyCamera = new THREE.PerspectiveCamera(
         60,
         window.innerWidth / window.innerHeight,
         1,
         10000
       );
+      
+      let currentCam = orbCamera;
+      
+			flyCamera.position.set(0, 25, 35);
+			flyCamera.lookAt(0, 25, 0);
 
+      
       const renderer = new THREE.WebGLRenderer();
       renderer.setSize(window.innerWidth, window.innerHeight);
       document.body.appendChild(renderer.domElement);
 
-      let controls = new OrbitControls(camera, renderer.domElement);
+      const orbControls = new OrbitControls(orbCamera, renderer.domElement);
+      const flyControls = new FlyControls(flyCamera, renderer.domElement);
+      flyControls.movementSpeed = 100;
+      flyControls.autoForward = false;
+      flyControls.dragToLook = true;
 
       const wireMaterial = new THREE.MeshBasicMaterial({
         color: 0x88ff88,
@@ -118,18 +127,14 @@
         leftShoulder: { type: "orbit", pos: [-20, 25, 55], target: camTarget },
         rightShoulder: { type: "orbit", pos: [20, 25, 55], target: camTarget },
         top: { type: "orbit", pos: [0, 80, 20], target: [0, 0, 20] },
-        // driver: { type: 'fp', pos: [0, 30, 35], target: camTarget }
+        driver: { type: 'fly', pos: [0, 25, 35], target: [0, 25, 0] }
       };
       setCamera(Object.values(cams)[0]);
-
-      const screen1 = new Screen(backgrounds.left);
-      const screen2 = new Screen(backgrounds.middle);
-      const screen3 = new Screen(backgrounds.right);
+     
+      const screen1 = new Screen(backgrounds.left, 0.66);
+      const screen2 = new Screen(backgrounds.middle, 0.33);
+      const screen3 = new Screen(backgrounds.right, 0);
       
-      screen1.setImageOffset(0.66);
-      screen2.setImageOffset(0.33);
-      screen3.setImageOffset(0);
-
       scene.add(screen1);
       scene.add(screen2);
       scene.add(screen3);
@@ -157,12 +162,11 @@
         setCamera(cams[value]);
       });
 
-      camGUI.add(camera.position, "x", -40, 40);
-      camGUI.add(camera.position, "y", -40, 40);
-      camGUI.add(camera.position, "z", -40, 80);
+      camGUI.add(currentCam.position, "x", -40, 40);
+      camGUI.add(currentCam.position, "y", -40, 40);
+      camGUI.add(currentCam.position, "z", -40, 80);
 
-      const rigModelPath =
-        "https://cdn.glitch.global/710b4225-853b-4ba5-bd3d-1a005f44407d/rig3.stl?v=1649761557874";
+      const rigModelPath = cdnPath + "rig3.stl";
       let rig = null;
 
       const stlLoader = new STLLoader();
@@ -212,23 +216,23 @@
         screen2.setSize(size);
         screen3.setSize(size);
         gui.updateDisplay();
+        document.activeElement.blur();
       }
 
       function setCamera(cam) {
         if (cam.type === "orbit") {
-          controls = new OrbitControls(camera, renderer.domElement);
-          camera.position.set(...cam.pos);
-          controls.target.set(...cam.target);
-          currentCam = camera;
-        } else if (cam.type === "fp") {
-          controls = new FirstPersonControls(fpCamera, renderer.domElement);
-          controls.movementSpeed = 150;
-          controls.lookSpeed = 0.1;
-          fpCamera.position.set(...cam.pos);
-          fpCamera.lookAt(...cam.target);
-          currentCam = fpCamera;
+          currentCam = orbCamera;
+          orbCamera.position.set(...cam.pos);
+          orbControls.target.set(...cam.target);
+          orbControls.update();
+        } else if (cam.type === "fly") {
+          currentCam = flyCamera;
+          flyCamera.position.set(...cam.pos);
+          flyCamera.lookAt(...cam.target);
+          flyControls.update(1);
         }
-        controls.update();
+        gui.updateDisplay();
+        document.activeElement.blur();
       }
 
       function animate() {
@@ -252,6 +256,8 @@
           screen1.material = screen2.material = screen3.material = wireMaterial;
 
         requestAnimationFrame(animate);
+        if(currentCam === flyCamera)
+          flyControls.update(1);
         renderer.render(scene, currentCam);
       }
       animate();
@@ -259,8 +265,8 @@
       window.addEventListener("resize", onWindowResize, false);
 
       function onWindowResize() {
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
+        currentCam.aspect = window.innerWidth / window.innerHeight;
+        currentCam.updateProjectionMatrix();
         renderer.setSize(window.innerWidth, window.innerHeight);
       }
     </script>
