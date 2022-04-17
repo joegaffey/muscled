@@ -12,7 +12,7 @@ export default class Screen extends THREE.Mesh {
       this.setImage(background);
     else 
       this.setImage();
-    if(offset)
+    if(offset || offset === 0)
       this.setImageOffset(offset);
   }
   
