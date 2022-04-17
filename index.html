@@ -8,6 +8,20 @@
       body {
         margin: 0;
       }
+      .loader {
+        font-family: verdana;
+        font-size: 24px;
+        display: none;
+        height: auto;
+        width: 250px;
+        position: absolute;
+        top: calc(50% - 50px);
+        left: calc(50% - 125px);
+        text-align: center;
+        padding: 30px 0;
+        background-color: #222222;
+        color: lightgray;
+      }
     </style>
     <script
       async
@@ -27,6 +41,9 @@
     <script type="text/javascript" src="./lib/dat.gui.min.js"></script>
   </head>
   <body>
+    <div class="loader">
+      Loading...
+    </div>
     <script type="module">
       import * as THREE from "three";
       import { OrbitControls } from "orbitControls";
@@ -35,6 +52,9 @@
       import Screen from "screen";
 
       const gui = new dat.GUI();
+      
+      let loadingCount = 0;
+      const loaderEl = document.querySelector(".loader");
 
       const scene = new THREE.Scene();
       const camera = new THREE.PerspectiveCamera(
@@ -146,9 +166,11 @@
       let rig = null;
 
       const stlLoader = new STLLoader();
+      startLoad();
       stlLoader.load(
         rigModelPath,
-        function (geometry) {
+        (geometry) => {
+          setTimeout(() => { endLoad(); }, 1000);
           const mesh = new THREE.Mesh(geometry, wireMaterial);
           mesh.rotation.x = -Math.PI / 2;
           mesh.rotation.z = Math.PI / 2;
@@ -160,12 +182,25 @@
           rigGUI.add(rig.position, "z", -20, 80);
         },
         (xhr) => {
-          console.log((xhr.loaded / xhr.total) * 100 + "% loaded");
+          loaderEl.innerHTML = Math.round((xhr.loaded / xhr.total) * 100) + "% loaded";
         },
         (error) => {
+          loaderEl.innerHTML = "Error loading model."
+          setTimeout(() => { endLoad(); }, 5000);
           console.log(error);
         }
-      );
+      );      
+      
+      function startLoad() {
+        loadingCount++;
+        loaderEl.style.display = "block";
+      }
+      
+      function endLoad() {
+        loadingCount--;
+        if(loadingCount === 0)
+          loaderEl.style.display = "none";
+      }
 
       function setScreenSize(size) {
         screens.angle = size.angle;
