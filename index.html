@@ -143,16 +143,21 @@
       screenGUI.add(screens, "wireframe");
 
       const camGUI = gui.addFolder("Camera");
-      const camSelect = { camera: Object.keys(cams)[0] };
-      camGUI.add(camSelect, "camera", Object.keys(cams)).onChange((value) => {
+      const camSelect = { view: Object.keys(cams)[0] };
+      camGUI.add(camSelect, "view", Object.keys(cams)).onChange((value) => {
         setCamera(cams[value]);
       });
       camGUI.add(camera, "fov", 20, 120).onChange((value) => {
         camera.updateProjectionMatrix();
       });
-      camGUI.add(camera.position, "x", -40, 40);
-      camGUI.add(camera.position, "y", -40, 40);
-      camGUI.add(camera.position, "z", -40, 80);
+      const camPosGUI = camGUI.addFolder("Position");
+      camPosGUI.add(camera.position, "x", -40, 40);
+      camPosGUI.add(camera.position, "y", -40, 40);
+      camPosGUI.add(camera.position, "z", -40, 80);
+      const camRotGUI = camGUI.addFolder("Rotation");
+      camRotGUI.add(camera.rotation, "x", -Math.PI, Math.PI);
+      camRotGUI.add(camera.rotation, "y", -Math.PI, Math.PI);
+      camRotGUI.add(camera.rotation, "z", -Math.PI, Math.PI);
 
       const rigModelPath = cdnPath + "rig3.stl";
       let rig = null;
