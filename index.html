@@ -32,7 +32,6 @@
         "imports": {
           "three": "./lib/three.module.js",
           "orbitControls": "./lib/OrbitControls.js",
-          "flyControls": "/lib/FlyControls.js",
           "stlLoader": "./lib/STLLoader.js",
           "vrButton": "./lib/VRButton.js",
           "screen": "./screen.js"
@@ -48,7 +47,6 @@
     <script type="module">
       import * as THREE from "three";
       import { OrbitControls } from "orbitControls";
-      import { FlyControls } from "flyControls";
       import STLLoader from "stlLoader";
       import Screen from "screen";
       // import { VRButton } from "vrButton";
@@ -59,25 +57,12 @@
       const loaderEl = document.querySelector(".loader");
 
       const scene = new THREE.Scene();
-      const orbCamera = new THREE.PerspectiveCamera(
+      const camera = new THREE.PerspectiveCamera(
         75,
         window.innerWidth / window.innerHeight,
         0.1,
         1000
       );
-      
-      const flyCamera = new THREE.PerspectiveCamera(
-        60,
-        window.innerWidth / window.innerHeight,
-        1,
-        10000
-      );
-      
-      let currentCam = orbCamera;
-      
-			flyCamera.position.set(0, 25, 35);
-			flyCamera.lookAt(0, 25, 0);
-
       
       const renderer = new THREE.WebGLRenderer();
       renderer.setSize(window.innerWidth, window.innerHeight);
@@ -86,12 +71,8 @@
       // renderer.xr.enabled = true;
       // document.body.appendChild(VRButton.createButton(renderer));
 
-      const orbControls = new OrbitControls(orbCamera, renderer.domElement);
-      const flyControls = new FlyControls(flyCamera, renderer.domElement);
-      flyControls.movementSpeed = 100;
-      flyControls.autoForward = false;
-      flyControls.dragToLook = true;
-
+      const controls = new OrbitControls(camera, renderer.domElement);
+      
       const wireMaterial = new THREE.MeshBasicMaterial({
         color: 0x88ff88,
         transparent: true,
@@ -129,10 +110,10 @@
       const camTarget = [0, 15, 0];
 
       const cams = {
-        leftShoulder: { type: "orbit", pos: [-20, 25, 55], target: camTarget },
-        rightShoulder: { type: "orbit", pos: [20, 25, 55], target: camTarget },
-        top: { type: "orbit", pos: [0, 80, 20], target: [0, 0, 20] },
-        driver: { type: 'fly', pos: [0, 25, 35], target: [0, 25, 0] }
+        leftShoulder: { pos: [-20, 25, 55], target: camTarget },
+        rightShoulder: { pos: [20, 25, 55], target: camTarget },
+        top: { pos: [0, 80, 20], target: [0, 0, 20] },
+        driver: { pos: [0, 25, 35], target: [0, 25, 34.9] },        
       };
       setCamera(Object.values(cams)[0]);
      
@@ -167,9 +148,9 @@
         setCamera(cams[value]);
       });
 
-      camGUI.add(currentCam.position, "x", -40, 40);
-      camGUI.add(currentCam.position, "y", -40, 40);
-      camGUI.add(currentCam.position, "z", -40, 80);
+      camGUI.add(camera.position, "x", -40, 40);
+      camGUI.add(camera.position, "y", -40, 40);
+      camGUI.add(camera.position, "z", -40, 80);
 
       const rigModelPath = cdnPath + "rig3.stl";
       let rig = null;
@@ -225,17 +206,10 @@
       }
 
       function setCamera(cam) {
-        if (cam.type === "orbit") {
-          currentCam = orbCamera;
-          orbCamera.position.set(...cam.pos);
-          orbControls.target.set(...cam.target);
-          orbControls.update();
-        } else if (cam.type === "fly") {
-          currentCam = flyCamera;
-          flyCamera.position.set(...cam.pos);
-          flyCamera.lookAt(...cam.target);
-          flyControls.update(1);
-        }
+        camera.position.set(...cam.pos);
+        controls.target.set(...cam.target);
+        controls.update();
+        
         gui.updateDisplay();
         document.activeElement.blur();
       }
@@ -259,10 +233,8 @@
           screen3.material = screen3.defaultMaterial;
         } else 
           screen1.material = screen2.material = screen3.material = wireMaterial;
-
-        if(currentCam === flyCamera)
-          flyControls.update(1);
-        renderer.render(scene, currentCam);
+        
+        renderer.render(scene, camera);
       }
       
       renderer.setAnimationLoop(() => {
