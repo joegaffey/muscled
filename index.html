@@ -78,8 +78,7 @@
         transparent: true,
         opacity: 0.25,
       });
-      const cdnPath =
-        "https://cdn.glitch.global/710b4225-853b-4ba5-bd3d-1a005f44407d/";
+      const cdnPath = "https://cdn.glitch.global/710b4225-853b-4ba5-bd3d-1a005f44407d/";
       // const backgrounds = {
       //   left: cdnPath + "mistyroad_w1920_cw1920_ch1080_cx0_cy0.jpg",
       //   middle: cdnPath + "mistyroad_w1920_cw1920_ch1080_cx1920_cy0.jpg",
@@ -97,14 +96,14 @@
 
       // prettier-ignore
       const sizes = { 
-        '19 4x3': { width: 19*sf, height:  19*sf/4*3, angle: 0.9, spacing: 11.5, centerOffset: -5.5, floorHeight: 26, z: 9 },
-        '24 16x9': { width: 24*sf, height: 24*sf/16*9, angle: 1.13, spacing: 13, centerOffset: -8, floorHeight: 26, z: 11 },
-        '27 16x9': { width: 27*sf, height: 27*sf/16*9, angle: 1.13, spacing: 14.5, centerOffset: -9, floorHeight: 26, z: 14 },
-        '29 21x9': { width: 29*sf, height: 29*sf/21*9, angle: 1.13, spacing: 15.5, centerOffset: -10, floorHeight: 26, z: 18 },
-        '32 16x9': { width: 32*sf, height: 32*sf/16*9, angle: 1.13, spacing: 17, centerOffset: -11, floorHeight: 26, z: 14 },
-        '34 21x9': { width: 34*sf, height: 34*sf/21*9, angle: 1.13, spacing: 18.5, centerOffset: -11.5, floorHeight: 26, z: 20 },
-        '40 16x9': { width: 40*sf, height: 40*sf/16*9, angle: 1.13, spacing: 21.5, centerOffset: -13.5, floorHeight: 26, z: 17 },
-        '42 16x9': { width: 42*sf, height: 42*sf/16*9, angle: 1.13, spacing: 22.5, centerOffset: -14.5, floorHeight: 26, z: 17 },
+        '19 4x3': { width: 19*sf, height:  19*sf/4*3, angle: 0.9, spacing: 11.35, centerOffset: -5.9, floorHeight: 26.5, z: 9 },
+        '24 16x9': { width: 24*sf, height: 24*sf/16*9, angle: 1.13, spacing: 12.6, centerOffset: -8.4, floorHeight: 26.5, z: 11 },
+        '27 16x9': { width: 27*sf, height: 27*sf/16*9, angle: 1.13, spacing: 14.2, centerOffset: -9.55, floorHeight: 26.5, z: 14 },
+        '29 21x9': { width: 29*sf, height: 29*sf/21*9, angle: 1.13, spacing: 15.2, centerOffset: -10.1, floorHeight: 26.5, z: 18 },
+        '32 16x9': { width: 32*sf, height: 32*sf/16*9, angle: 1.13, spacing: 16.9, centerOffset: -11.1, floorHeight: 28, z: 16 },
+        '34 21x9': { width: 34*sf, height: 34*sf/21*9, angle: 1.13, spacing: 17.8, centerOffset: -12, floorHeight: 27.5, z: 20 },
+        '40 16x9': { width: 40*sf, height: 40*sf/16*9, angle: 1.13, spacing: 21, centerOffset: -14, floorHeight: 29, z: 17 },
+        '42 16x9': { width: 42*sf, height: 42*sf/16*9, angle: 1.13, spacing: 22, centerOffset: -14.6, floorHeight: 29, z: 17 },
       }
 
       const camTarget = [0, 15, 0];
@@ -128,19 +127,23 @@
       let screens = {
         wireframe: false,
         size: "27 16x9",
+        bezel: 0.3
       };
       setScreenSize(sizes[screens.size]);
-
+      
       const screenGUI = gui.addFolder("Screens");
       screenGUI.add(screens, "size", Object.keys(sizes)).onChange((value) => {
         setScreenSize(sizes[value]);
       });
-      screenGUI.add(screens, "angle", 0, 1.8);
-      screenGUI.add(screens, "spacing", 0, 80);
-      screenGUI.add(screens, "floorHeight", 0, 50);
-      screenGUI.add(screens, "z", -10, 40);
-      screenGUI.add(screens, "centerOffset", -30, 20);
+      screenGUI.add(screens, "angle", 0, 1.8, 0.01);
+      screenGUI.add(screens, "spacing", 0, 80, 0.01);
+      screenGUI.add(screens, "floorHeight", 0, 50, 0.01);
+      screenGUI.add(screens, "z", -10, 40, 0.01);
+      screenGUI.add(screens, "centerOffset", -30, 20, 0.01);
       screenGUI.add(screens, "wireframe");
+      screenGUI.add(screens, "bezel", 0, 3, 0.01).onChange((value) => {
+        setBezel(value);
+      });
 
       const camGUI = gui.addFolder("Camera");
       const camSelect = { view: Object.keys(cams)[0] };
@@ -186,7 +189,13 @@
           setTimeout(() => { endLoad(); }, 5000);
           console.log(error);
         }
-      );      
+      );
+      
+      function setBezel(size) {
+        screen1.setBezel(size);
+        screen2.setBezel(size);
+        screen3.setBezel(size);
+      }
       
       function startLoad() {
         loadingCount++;
@@ -251,8 +260,8 @@
       window.addEventListener("resize", onWindowResize, false);
 
       function onWindowResize() {
-        currentCam.aspect = window.innerWidth / window.innerHeight;
-        currentCam.updateProjectionMatrix();
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
         renderer.setSize(window.innerWidth, window.innerHeight);
       }
     </script>
