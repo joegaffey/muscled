@@ -96,14 +96,14 @@
 
       // prettier-ignore
       const sizes = { 
-        '19 4x3': { width: 19*sf, height:  19*sf/4*3, angle: 0.9, spacing: 11.35, centerOffset: -5.9, floorHeight: 26.5, z: 9 },
-        '24 16x9': { width: 24*sf, height: 24*sf/16*9, angle: 1.13, spacing: 12.6, centerOffset: -8.4, floorHeight: 26.5, z: 11 },
-        '27 16x9': { width: 27*sf, height: 27*sf/16*9, angle: 1.13, spacing: 14.2, centerOffset: -9.55, floorHeight: 26.5, z: 14 },
-        '29 21x9': { width: 29*sf, height: 29*sf/21*9, angle: 1.13, spacing: 15.2, centerOffset: -10.1, floorHeight: 26.5, z: 18 },
-        '32 16x9': { width: 32*sf, height: 32*sf/16*9, angle: 1.13, spacing: 16.9, centerOffset: -11.1, floorHeight: 28, z: 16 },
-        '34 21x9': { width: 34*sf, height: 34*sf/21*9, angle: 1.13, spacing: 17.8, centerOffset: -12, floorHeight: 27.5, z: 20 },
-        '40 16x9': { width: 40*sf, height: 40*sf/16*9, angle: 1.13, spacing: 21, centerOffset: -14, floorHeight: 29, z: 17 },
-        '42 16x9': { width: 42*sf, height: 42*sf/16*9, angle: 1.13, spacing: 22, centerOffset: -14.6, floorHeight: 29, z: 17 },
+        '19 4x3': { x: 4, y: 3, width: 19*sf, height:  19*sf/4*3, angle: 0.9, spacing: 11.35, centerOffset: -5.9, floorHeight: 26.5, z: 16 },
+        '24 16x9': { x: 16, y: 9, width: 24*sf, height: 24*sf/16*9, angle: 1.13, spacing: 12.6, centerOffset: -8.4, floorHeight: 27, z: 18 },
+        '27 16x9': { x: 16, y: 9, width: 27*sf, height: 27*sf/16*9, angle: 1.13, spacing: 14.2, centerOffset: -9.55, floorHeight: 27.5, z: 18 },
+        '29 21x9': { x: 21, y: 9, width: 29*sf, height: 29*sf/21*9, angle: 1.13, spacing: 15.2, centerOffset: -10.1, floorHeight: 26.5, z: 18 },
+        '32 16x9': { x: 16, y: 9, width: 32*sf, height: 32*sf/16*9, angle: 1.13, spacing: 16.9, centerOffset: -11.1, floorHeight: 28, z: 16 },
+        '34 21x9': { x: 21, y: 9, width: 34*sf, height: 34*sf/21*9, angle: 1.13, spacing: 17.8, centerOffset: -12, floorHeight: 27.5, z: 20 },
+        '40 16x9': { x: 16, y: 9, width: 40*sf, height: 40*sf/16*9, angle: 1.13, spacing: 21, centerOffset: -14, floorHeight: 29, z: 17 },
+        '42 16x9': { x: 16, y: 9, width: 42*sf, height: 42*sf/16*9, angle: 1.13, spacing: 22, centerOffset: -14.6, floorHeight: 29, z: 17 },
       }
 
       const camTarget = [0, 15, 0];
@@ -116,9 +116,9 @@
       };
       setCamera(Object.values(cams)[0]);
      
-      const screen1 = new Screen(backgrounds.left, 0.66);
-      const screen2 = new Screen(backgrounds.middle, 0.33);
-      const screen3 = new Screen(backgrounds.right, 0);
+      const screen1 = new Screen(16, 9, backgrounds.left, 'left');
+      const screen2 = new Screen(16, 9, backgrounds.middle, 'middle');
+      const screen3 = new Screen(16, 9, backgrounds.right, 'right');
       
       scene.add(screen1);
       scene.add(screen2);
@@ -127,15 +127,17 @@
       let screens = {
         wireframe: false,
         size: "27 16x9",
-        bezel: 0.3
+        bezel: 0.3,
+        single: false
       };
       setScreenSize(sizes[screens.size]);
       
       const screenGUI = gui.addFolder("Screens");
+      screenGUI.add(screens, "single");
       screenGUI.add(screens, "size", Object.keys(sizes)).onChange((value) => {
         setScreenSize(sizes[value]);
       });
-      screenGUI.add(screens, "angle", 0, 1.8, 0.01);
+      screenGUI.add(screens, "angle", 0, Math.PI/2, 0.01);
       screenGUI.add(screens, "spacing", 0, 80, 0.01);
       screenGUI.add(screens, "floorHeight", 0, 50, 0.01);
       screenGUI.add(screens, "z", -10, 40, 0.01);
@@ -229,26 +231,39 @@
         gui.updateDisplay();
         document.activeElement.blur();
       }
-
+      
       function animate() {
-        screen1.rotation.y = screens.angle * -1;
-        screen3.rotation.y = screens.angle;
-
-        screen1.position.set(screens.spacing, screens.floorHeight, screens.z);
-        screen3.position.set(-screens.spacing, screens.floorHeight, screens.z);
-
         screen2.position.set(
           0,
           screens.floorHeight,
           screens.z + screens.centerOffset
         );
-
-        if (!screens.wireframe) {
-          screen1.material = screen1.defaultMaterial;
+        if (!screens.wireframe)
           screen2.material = screen2.defaultMaterial;
-          screen3.material = screen3.defaultMaterial;
-        } else 
-          screen1.material = screen2.material = screen3.material = wireMaterial;
+        
+        if(!screens.single) {    
+          screen1.visible = true;
+          screen3.visible = true;
+        
+          screen1.rotation.y = screens.angle * -1;
+          screen3.rotation.y = screens.angle;
+
+          screen1.position.set(screens.spacing, screens.floorHeight, screens.z);
+          screen3.position.set(-screens.spacing, screens.floorHeight, screens.z);
+
+
+          if (!screens.wireframe) {
+            screen1.material = screen1.defaultMaterial;
+            screen3.material = screen3.defaultMaterial;
+          } 
+          else 
+            screen1.material = screen2.material = screen3.material = wireMaterial;
+          
+        }
+        else {
+          screen1.visible = false;
+          screen3.visible = false;
+        }
         
         renderer.render(scene, camera);
       }
