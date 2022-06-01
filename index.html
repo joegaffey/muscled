@@ -149,7 +149,7 @@
       screenGUI.add(screens, "size", Object.keys(sizes)).onChange((value) => {
         setScreenSize(sizes[value]);
       });
-      screenGUI.add(screens, "fov", 0, 2, 0.01).onChange((value) => {
+      screenGUI.add(screens, "fov", 0, 3, 0.01).onChange((value) => {
         setFov(value);
       });
       screenGUI.add(screens, "xOffset", -0.5, 0.5, 0.01).onChange((value) => {
