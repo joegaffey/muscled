@@ -3,15 +3,18 @@ import * as THREE from "three";
 export default class Screen extends THREE.Mesh {
   
   static OFFSETS = {
-    left: 0.66,
-    middle: 0.33,
-    right: 0    
+    left: 1/3,
+    middle: 0,
+    right: -1/3    
   };
 
   constructor(xAspect, yAspect, background, placement) {
     super();
     
     this.bezel = 0.5;
+    this.fov = 1;
+    this.xOffset = 0;
+    this.yOffset = 0;
     
     this.geometry = new THREE.BoxGeometry(xAspect, yAspect, 0.5);
     this.plasticMaterial = new THREE.MeshBasicMaterial({
@@ -39,9 +42,7 @@ export default class Screen extends THREE.Mesh {
     else 
       this.setImagePath();
     
-    this.placement = placement;
     this.offset = Screen.OFFSETS[placement];
-    console.log(this.offset)
     if(this.offset || this.offset === 0)
       this.setImageOffset(this.offset);
   }
@@ -54,6 +55,9 @@ export default class Screen extends THREE.Mesh {
     if(texture) {
       texture.repeat.x = 1 / 3;
       texture.offset.x = offset;
+      texture.center.x = 0.5;
+      texture.center.y = 0.5;
+      texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
     }
   }
 
@@ -66,15 +70,17 @@ export default class Screen extends THREE.Mesh {
     this.display.geometry.dispose();
     this.display.geometry = new THREE.PlaneGeometry(size.width - this.bezel, size.height - this.bezel);
     const tex = this.display.material.map;
-    if(tex.image) {
-      
-      // const x = (tex.image.width / tex.image.height) * (this.height / this.width) / 3;
-      // tex.repeat.y = x;
-      // tex.offset.y = (1 - x) / 2;
-      
-      // const x = (tex.image.width / tex.image.height) * (this.height / this.width);
-      // tex.repeat.x = 1 / x;
-      // tex.offset.x = (this.offset / x) * 3 + 1/6;
+    if(tex.image) {      
+      const imgAspect = tex.image.width / tex.image.height;
+      const screenAspect = this.width / this.height;
+      let fovAdjust = 1;
+      if(screenAspect * 3 < imgAspect)
+        fovAdjust = screenAspect;
+      const yAdjust = imgAspect / screenAspect / 3;
+      tex.repeat.y = yAdjust * this.fov / fovAdjust;
+      tex.repeat.x = this.fov / 3 / fovAdjust;
+      tex.offset.x = (this.offset * this.fov / fovAdjust) + this.xOffset;
+      tex.offset.y = this.yOffset;
     }
   }
   
@@ -82,6 +88,21 @@ export default class Screen extends THREE.Mesh {
     this.display.geometry.dispose();
     this.display.geometry = new THREE.PlaneGeometry(this.size.width - size, this.size.height - size);
   }  
+  
+  setFov(size) {
+    this.fov = size;
+    this.setSize(this.size);
+  }
+  
+  setXOffset(size) {
+    this.xOffset = size;
+    this.setSize(this.size);
+  }
+  
+  setYOffset(size) {
+    this.yOffset = size;
+    this.setSize(this.size);
+  }
   
   setImagePath(path) {
     let frontMaterial = this.plasticMaterial;
