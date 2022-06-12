@@ -23,74 +23,96 @@ export default class Screen extends THREE.Mesh {
     
     this.defaultMaterial = this.material = this.plasticMaterial;
     
-    this.width = xAspect;
-    this.height = yAspect;
+    this.xAspect = xAspect;
+    this.yAspect = yAspect;
     
-    const geometry = new THREE.PlaneGeometry(this.width, this.height);
-    const material = new THREE.MeshBasicMaterial({color: 0x0000ff, side: THREE.DoubleSide});
+    this.img = this.getDefaultImage();
     
-    this.display = new THREE.Mesh(geometry, material);
+    const dTexture = new THREE.CanvasTexture(this.img);
+    const dMaterial = new THREE.MeshBasicMaterial({
+      map: dTexture,
+    });
+    
+    const dGeometry = new THREE.PlaneGeometry(this.xAspect, this.yAspect);
+    this.display = new THREE.Mesh(dGeometry, dMaterial);
     this.display.position.x = this.position.x;
     this.display.position.y = this.position.y;
-    this.display.position.z = this.position.z + 0.3;
+    this.display.position.z = this.position.z + 0.3;    
+    this.display.material = dMaterial;
+    
     this.add(this.display);
-    
-    this.loader = new THREE.TextureLoader();    
-    
-    if(background)
-      this.setImagePath(background);
-    else 
-      this.setImagePath();
+       
+    this.setImage(background);
     
     this.offset = Screen.OFFSETS[placement];
     if(this.offset || this.offset === 0)
       this.setImageOffset(this.offset);
   }
   
+  getDefaultImage() {
+    const canvas = document.createElement('canvas');
+    canvas.width = this.xAspect * 300;
+    canvas.height = this.yAspect * 100;
+    const ctx = canvas.getContext('2d')
+    ctx.fillStyle = '#008';
+    ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    ctx.fillStyle = '#FFF';
+    ctx.font = "30px Arial";
+    ctx.fillText("C:\\loading...", 100, 100);
+    return canvas;
+  }
+  
   setImageOffset(offset) {
-    let texture  = null;
+    let map = null;
     if(this.display.material)
-      texture = this.display.material.map;
+      map = this.display.material.map;
     
-    if(texture) {
-      texture.repeat.x = 1 / 3;
-      texture.offset.x = offset;
-      texture.center.x = 0.5;
-      texture.center.y = 0.5;
-      texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+    if(map) {
+      map.repeat.x = 1 / 3;
+      map.offset.x = offset;
+      map.center.x = 0.5;
+      map.center.y = 0.5;
+      map.wrapS = map.wrapT = THREE.RepeatWrapping;
     }
   }
 
   setSize(size) {
-    this.width = size.x;
-    this.height = size.y;
     this.size = size;
+    this.xAspect = size.x;
+    this.yAspect = size.y;
+    this.fov = size.fov;
     this.geometry.dispose();
     this.geometry = new THREE.BoxGeometry(size.width, size.height, 0.5);
     this.display.geometry.dispose();
     this.display.geometry = new THREE.PlaneGeometry(size.width - this.bezel, size.height - this.bezel);
     const tex = this.display.material.map;
-    if(tex.image) {      
+    if(tex.image && this.img) {      
       const imgAspect = tex.image.width / tex.image.height;
-      const screenAspect = this.width / this.height;
+      const screenAspect = this.xAspect / this.yAspect;
       let fovAdjust = 1;
       if(screenAspect * 3 < imgAspect)
         fovAdjust = screenAspect;
       const yAdjust = imgAspect / screenAspect / 3;
-      tex.repeat.y = yAdjust * this.fov / fovAdjust;
-      tex.repeat.x = this.fov / 3 / fovAdjust;
-      tex.offset.x = (this.offset * this.fov / fovAdjust) + this.xOffset;
-      tex.offset.y = this.yOffset;
+      
+      const ctx  = tex.image.getContext('2d');
+      ctx.clearRect(0, 0, tex.image.width, tex.image.height);
+      const xAdjust = (tex.image.width - (tex.image.width * this.fov)) / 2;
+      ctx.drawImage(this.img, 
+                    xAdjust + this.xOffset * tex.image.width,
+                    0 + this.yOffset * tex.image.height, 
+                    tex.image.width * this.fov,
+                    tex.image.height * this.fov / yAdjust);
+      tex.needsUpdate = true;
     }
   }
   
   setBezel(size) {
-    this.display.geometry.dispose();
-    this.display.geometry = new THREE.PlaneGeometry(this.size.width - size, this.size.height - size);
+    this.bezel = size;
+    this.setSize(this.size);
   }  
   
   setFov(size) {
-    this.fov = size;
+    this.size.fov = size;
     this.setSize(this.size);
   }
   
@@ -104,11 +126,12 @@ export default class Screen extends THREE.Mesh {
     this.setSize(this.size);
   }
   
-  setImagePath(path) {
-    let frontMaterial = this.plasticMaterial;
-    if(path) {      
-      frontMaterial = new THREE.MeshBasicMaterial({ map: this.loader.load(path) });
-    }    
-    this.display.defaultMaterial = this.display.material = frontMaterial;
+  setImage(path) {    
+    this.img = new Image();
+    this.img.src = path;
+    this.img.crossOrigin = 'anonymous';
+    this.img.onload = () => {
+      this.setSize(this.size);
+    };
   }
 }
