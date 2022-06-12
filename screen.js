@@ -99,7 +99,7 @@ export default class Screen extends THREE.Mesh {
       const xAdjust = (tex.image.width - (tex.image.width * this.fov)) / 2;
       ctx.drawImage(this.img, 
                     xAdjust + this.xOffset * tex.image.width,
-                    0 + this.yOffset * tex.image.height, 
+                    (1 - this.fov / yAdjust) / 2 * tex.image.height + this.yOffset * tex.image.height, 
                     tex.image.width * this.fov,
                     tex.image.height * this.fov / yAdjust);
       tex.needsUpdate = true;
