@@ -89,30 +89,30 @@
         left: cdnPath + "racing1.jpg",
         middle: cdnPath + "racing1.jpg",
         right: cdnPath + "racing1.jpg",
-      };      
-
+      };
+            
       const img = "wallpaper.jpg";
       const sf = 0.75;
 
       // prettier-ignore
       const sizes = { 
-        '19" 4x3': { x: 4, y: 3, width: 19*sf, height:  19*sf/4*3, angle: 0.9, spacing: 11.35, centerOffset: -5.9, floorHeight: 26.5, z: 16 },
-        '24" 16x9': { x: 16, y: 9, width: 24*sf, height: 24*sf/16*9, angle: 1.13, spacing: 12.6, centerOffset: -8.4, floorHeight: 27, z: 18 },
-        '27" 16x9': { x: 16, y: 9, width: 27*sf, height: 27*sf/16*9, angle: 1.13, spacing: 14.2, centerOffset: -9.55, floorHeight: 27.5, z: 18 },
-        '29" 21x9': { x: 21, y: 9, width: 29*sf, height: 29*sf/21*9, angle: 1.13, spacing: 15.2, centerOffset: -10.1, floorHeight: 26.5, z: 18 },
-        '32" 16x9': { x: 16, y: 9, width: 32*sf, height: 32*sf/16*9, angle: 1.13, spacing: 16.9, centerOffset: -11.1, floorHeight: 28, z: 16 },
-        '34" 21x9': { x: 21, y: 9, width: 34*sf, height: 34*sf/21*9, angle: 1.13, spacing: 17.8, centerOffset: -12, floorHeight: 27.5, z: 20 },
-        '40" 16x9': { x: 16, y: 9, width: 40*sf, height: 40*sf/16*9, angle: 1.13, spacing: 21, centerOffset: -14, floorHeight: 29, z: 17 },
-        '42" 16x9': { x: 16, y: 9, width: 42*sf, height: 42*sf/16*9, angle: 1.13, spacing: 22, centerOffset: -14.6, floorHeight: 29, z: 17 },
-        '43" 16x9': { x: 16, y: 9, width: 43*sf, height: 43*sf/16*9, angle: 1.13, spacing: 23, centerOffset: -15, floorHeight: 29, z: 17 },
-        '43" 32x9': { x: 32, y: 9, width: 43*sf, height: 43*sf/32*9, angle: 1.13, spacing: 23, centerOffset: -15, floorHeight: 27, z: 25 },
-        '49" 16x9': { x: 16, y: 9, width: 49*sf, height: 49*sf/16*9, angle: 1.2, spacing: 25, centerOffset: -17.6, floorHeight: 29.5, z: 15 },
-        '49" 32x9': { x: 32, y: 9, width: 49*sf, height: 49*sf/32*9, angle: 1.2, spacing: 25, centerOffset: -17.6, floorHeight: 27, z: 25 },
-        '50" 16x9': { x: 16, y: 9, width: 50*sf, height: 50*sf/16*9, angle: 1.2, spacing: 25.75, centerOffset: -17.6, floorHeight: 29.5, z: 15 },
-        '55" 16x9': { x: 16, y: 9, width: 55*sf, height: 55*sf/16*9, angle: 1.2, spacing: 28, centerOffset: -19.5, floorHeight: 30, z: 12 },
-        '65" 16x9': { x: 16, y: 9, width: 65*sf, height: 65*sf/16*9, angle: 1.2, spacing: 33, centerOffset: -23, floorHeight: 31.5, z: 10 },
-        '75" 16x9': { x: 16, y: 9, width: 75*sf, height: 75*sf/16*9, angle: 1.2, spacing: 38, centerOffset: -27, floorHeight: 32, z: 8 },
-        '85" 16x9': { x: 16, y: 9, width: 85*sf, height: 85*sf/16*9, angle: 1.2, spacing: 43, centerOffset: -30, floorHeight: 33.3, z: 7 },
+        '19" 4x3': { x: 4, y: 3, width: 19*sf, height:  19*sf/4*3, fov: 1.35, angle: 0.9, spacing: 11.35, centerOffset: -5.9, floorHeight: 26.5, z: 16 },
+        '24" 16x9': { x: 16, y: 9, width: 24*sf, height: 24*sf/16*9, fov: 1, angle: 1.13, spacing: 12.6, centerOffset: -8.4, floorHeight: 27, z: 18 },
+        '27" 16x9': { x: 16, y: 9, width: 27*sf, height: 27*sf/16*9, fov: 1, angle: 1.13, spacing: 14.2, centerOffset: -9.55, floorHeight: 27.5, z: 18 },
+        '29" 21x9': { x: 21, y: 9, width: 29*sf, height: 29*sf/21*9, fov: 0.76, angle: 1.13, spacing: 15.2, centerOffset: -10.1, floorHeight: 26.5, z: 18 },
+        '32" 16x9': { x: 16, y: 9, width: 32*sf, height: 32*sf/16*9, fov: 1, angle: 1.13, spacing: 16.9, centerOffset: -11.1, floorHeight: 28, z: 16 },
+        '34" 21x9': { x: 21, y: 9, width: 34*sf, height: 34*sf/21*9, fov: 0.76, angle: 1.13, spacing: 17.8, centerOffset: -12, floorHeight: 27.5, z: 20 },
+        '40" 16x9': { x: 16, y: 9, width: 40*sf, height: 40*sf/16*9, fov: 1, angle: 1.13, spacing: 21, centerOffset: -14, floorHeight: 29, z: 17 },
+        '42" 16x9': { x: 16, y: 9, width: 42*sf, height: 42*sf/16*9, fov: 1, angle: 1.13, spacing: 22, centerOffset: -14.6, floorHeight: 29, z: 17 },
+        '43" 16x9': { x: 16, y: 9, width: 43*sf, height: 43*sf/16*9, fov: 1, angle: 1.13, spacing: 23, centerOffset: -15, floorHeight: 29, z: 17 },
+        '43" 32x9': { x: 32, y: 9, width: 43*sf, height: 43*sf/32*9, fov: 0.5, angle: 1.13, spacing: 23, centerOffset: -15, floorHeight: 27, z: 25 },
+        '49" 16x9': { x: 16, y: 9, width: 49*sf, height: 49*sf/16*9, fov: 1, angle: 1.2, spacing: 25, centerOffset: -17.6, floorHeight: 29.5, z: 15 },
+        '49" 32x9': { x: 32, y: 9, width: 49*sf, height: 49*sf/32*9, fov: 0.5, angle: 1.2, spacing: 25, centerOffset: -17.6, floorHeight: 27, z: 25 },
+        '50" 16x9': { x: 16, y: 9, width: 50*sf, height: 50*sf/16*9, fov: 1, angle: 1.2, spacing: 25.75, centerOffset: -17.6, floorHeight: 29.5, z: 15 },
+        '55" 16x9': { x: 16, y: 9, width: 55*sf, height: 55*sf/16*9, fov: 1, angle: 1.2, spacing: 28, centerOffset: -19.5, floorHeight: 30, z: 12 },
+        '65" 16x9': { x: 16, y: 9, width: 65*sf, height: 65*sf/16*9, fov: 1, angle: 1.2, spacing: 33, centerOffset: -23, floorHeight: 31.5, z: 10 },
+        '75" 16x9': { x: 16, y: 9, width: 75*sf, height: 75*sf/16*9, fov: 1, angle: 1.2, spacing: 38, centerOffset: -27, floorHeight: 32, z: 8 },
+        '85" 16x9': { x: 16, y: 9, width: 85*sf, height: 85*sf/16*9, fov: 1, angle: 1.2, spacing: 43, centerOffset: -30, floorHeight: 33.3, z: 7 },
       }
 
       const camTarget = [0, 15, 0];
@@ -149,13 +149,13 @@
       screenGUI.add(screens, "size", Object.keys(sizes)).onChange((value) => {
         setScreenSize(sizes[value]);
       });
-      screenGUI.add(screens, "fov", 0, 3, 0.01).onChange((value) => {
+      screenGUI.add(screens, "fov", 0.1, 10, 0.01).onChange((value) => {
         setFov(value);
       });
-      screenGUI.add(screens, "xOffset", -0.5, 0.5, 0.01).onChange((value) => {
+      screenGUI.add(screens, "xOffset", -1, 1, 0.01).onChange((value) => {
         setXOffset(value);
       });
-      screenGUI.add(screens, "yOffset", -0.5, 0.5, 0.01).onChange((value) => {
+      screenGUI.add(screens, "yOffset", -1, 1, 0.01).onChange((value) => {
         setYOffset(value);
       });
       screenGUI.add(screens, "angle", 0, Math.PI/2, 0.01);
@@ -164,7 +164,7 @@
       screenGUI.add(screens, "z", -10, 40, 0.01);
       screenGUI.add(screens, "centerOffset", -30, 20, 0.01);
       screenGUI.add(screens, "wireframe");
-      screenGUI.add(screens, "bezel", 0, 3, 0.01).onChange((value) => {
+      screenGUI.add(screens, "bezel", 0, 5, 0.01).onChange((value) => {
         setBezel(value);
       });
 
@@ -250,6 +250,7 @@
       }
 
       function setScreenSize(size) {
+        screens.fov = size.fov;
         screens.angle = size.angle;
         screens.spacing = size.spacing;
         screens.centerOffset = size.centerOffset;
