@@ -153,7 +153,8 @@
       setCamera(Object.values(cams)[0]);
       
       const defaultSize = '32" 16x9';
-      let currentSpec = specs[defaultSize];
+      const currentSpec = {}
+      setCurrentSpec(specs[defaultSize]);
      
       const screen1 = new Screen(currentSpec, images["Project Cars 2"].left, 'left');
       const screen2 = new Screen(currentSpec, images["Project Cars 2"].middle, 'middle');
@@ -249,12 +250,20 @@
       }
                
       function setScreenSpec(spec) {
-        currentSpec = spec;
+        setCurrentSpec(spec);
+        gui.updateDisplay();
+        displayGUI.updateDisplay();
+        screenGUI.updateDisplay();
         screen1.setSpec(currentSpec);
         screen2.setSpec(currentSpec);
         screen3.setSpec(currentSpec);
-        gui.updateDisplay();
         document.activeElement.blur();
+      }
+      
+      function setCurrentSpec(spec) {
+        Object.keys(spec).forEach(key => {
+          currentSpec[key] = spec[key];
+        });
       }
       
       function startLoad() {
