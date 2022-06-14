@@ -1,4 +1,4 @@
-import * as THREE from "three";
+import * as THREE from 'three';
 
 export default class Screen extends THREE.Mesh {
   
@@ -19,8 +19,7 @@ export default class Screen extends THREE.Mesh {
     });
     
     this.defaultMaterial = this.material = this.plasticMaterial;
-    
-    this.img = this.getDefaultImage();
+    this.img = this.getLoadingImage();
     
     const dTexture = new THREE.CanvasTexture(this.img);
     const dMaterial = new THREE.MeshBasicMaterial({
@@ -42,21 +41,21 @@ export default class Screen extends THREE.Mesh {
     this.setImage(background);
   }
   
-  getDefaultImage() {
+  getLoadingImage() {
     const canvas = document.createElement('canvas');
     canvas.width = this.spec.xAspect * 300;
     canvas.height = this.spec.yAspect * 100;
     const ctx = canvas.getContext('2d')
-    this.drawDefaultImg(ctx);
+    this.drawLoadingImg(ctx);
     return canvas;
   }
    
-  drawDefaultImg(ctx) {
+  drawLoadingImg(ctx) {
     ctx.fillStyle = '#004';
     ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
     ctx.fillStyle = '#AAA';
-    ctx.font = "75px Arial";
-    const text = "LOADING...";
+    ctx.font = '75px Arial';
+    const text = 'LOADING...';
     const tm = ctx.measureText(text);
     ctx.fillText(text, ctx.canvas.width / 2 - tm.width / 2, ctx.canvas.height /2);
   }
@@ -108,7 +107,15 @@ export default class Screen extends THREE.Mesh {
     }
   }
   
-  setImage(path) {    
+  setLoading() {
+    const tex = this.display.material.map;
+    const ctx  = tex.image.getContext('2d');
+    this.drawLoadingImg(ctx);
+    tex.needsUpdate = true;
+  }
+  
+  setImage(path) {
+    this.setLoading();
     this.img = new Image();
     this.img.src = path;
     this.img.crossOrigin = 'anonymous';
