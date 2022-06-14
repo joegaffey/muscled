@@ -45,16 +45,16 @@
       Loading...
     </div>
     <script type="module">
-      import * as THREE from "three";
-      import { OrbitControls } from "orbitControls";
-      import STLLoader from "stlLoader";
-      import Screen from "screen";
-      // import { VRButton } from "vrButton";
+      import * as THREE from 'three';
+      import { OrbitControls } from 'orbitControls';
+      import STLLoader from 'stlLoader';
+      import Screen from 'screen';
+      // import { VRButton } from 'vrButton';
 
       const gui = new dat.GUI();
       
       let loadingCount = 0;
-      const loaderEl = document.querySelector(".loader");
+      const loaderEl = document.querySelector('.loader');
 
       const scene = new THREE.Scene();
       const camera = new THREE.PerspectiveCamera(
@@ -79,43 +79,43 @@
         opacity: 0.25,
       });
       
-      const cdnPath = "https://cdn.glitch.global/710b4225-853b-4ba5-bd3d-1a005f44407d/";
+      const cdnPath = 'https://cdn.glitch.global/710b4225-853b-4ba5-bd3d-1a005f44407d/';
       
       const images = {
-        "Project Cars 2": {
-          left: cdnPath + "racing1.jpg",
-          middle: cdnPath + "racing1.jpg",
-          right: cdnPath + "racing1.jpg",
+        'Project Cars 2': {
+          left: cdnPath + 'racing1.jpg',
+          middle: cdnPath + 'racing1.jpg',
+          right: cdnPath + 'racing1.jpg',
         },
-        "Project Cars": {
-          left: cdnPath + "pcars.jpg",
-          middle: cdnPath + "pcars.jpg",
-          right: cdnPath + "pcars.jpg",
+        'Project Cars': {
+          left: cdnPath + 'pcars.jpg',
+          middle: cdnPath + 'pcars.jpg',
+          right: cdnPath + 'pcars.jpg',
         },
-        "iRacing": {
-          left: cdnPath + "iracing.jpg",
-          middle: cdnPath + "iracing.jpg",
-          right: cdnPath + "iracing.jpg",
+        'iRacing': {
+          left: cdnPath + 'iracing.jpg',
+          middle: cdnPath + 'iracing.jpg',
+          right: cdnPath + 'iracing.jpg',
         },
-        "Assetto Corsa": {
-          left: cdnPath + "ac1.jpg",
-          middle: cdnPath + "ac1.jpg",
-          right: cdnPath + "ac1.jpg",
+        'Assetto Corsa': {
+          left: cdnPath + 'ac1.jpg',
+          middle: cdnPath + 'ac1.jpg',
+          right: cdnPath + 'ac1.jpg',
         },
-        "RFactor 2": {
-          left: cdnPath + "rfactor2_1.jpg",
-          middle: cdnPath + "rfactor2_1.jpg",
-          right: cdnPath + "rfactor2_1.jpg",
+        'RFactor 2': {
+          left: cdnPath + 'rfactor2_1.jpg',
+          middle: cdnPath + 'rfactor2_1.jpg',
+          right: cdnPath + 'rfactor2_1.jpg',
         },
-        "Dirt Rally (Cockpit)": {
-          left: cdnPath + "dirtrally_cockpit4.jpg",
-          middle: cdnPath + "dirtrally_cockpit4.jpg",
-          right: cdnPath + "dirtrally_cockpit4.jpg",
+        'Dirt Rally (Cockpit)': {
+          left: cdnPath + 'dirtrally_cockpit4.jpg',
+          middle: cdnPath + 'dirtrally_cockpit4.jpg',
+          right: cdnPath + 'dirtrally_cockpit4.jpg',
         },
-        "Dirt Rally (Bonnet)": {
-          left: cdnPath + "dirtrally_g44.jpg",
-          middle: cdnPath + "dirtrally_g44.jpg",
-          right: cdnPath + "dirtrally_g44.jpg",
+        'Dirt Rally (Bonnet)': {
+          left: cdnPath + 'dirtrally_g44.jpg',
+          middle: cdnPath + 'dirtrally_g44.jpg',
+          right: cdnPath + 'dirtrally_g44.jpg',
         },
       };
             
@@ -156,9 +156,9 @@
       const currentSpec = {}
       setCurrentSpec(specs[defaultSize]);
      
-      const screen1 = new Screen(currentSpec, images["Project Cars 2"].left, 'left');
-      const screen2 = new Screen(currentSpec, images["Project Cars 2"].middle, 'middle');
-      const screen3 = new Screen(currentSpec, images["Project Cars 2"].right, 'right');
+      const screen1 = new Screen(currentSpec, images['Project Cars 2'].left, 'left');
+      const screen2 = new Screen(currentSpec, images['Project Cars 2'].middle, 'middle');
+      const screen3 = new Screen(currentSpec, images['Project Cars 2'].right, 'right');
       
       scene.add(screen1);
       scene.add(screen2);
@@ -171,45 +171,45 @@
         image: images
       };
       
-      const displayGUI = gui.addFolder("Display");
-      displayGUI.add(currentSpec, "fov", 0.1, 10, 0.01).onChange((value) => { setSpecProp("fov", value); });
-      displayGUI.add(currentSpec, "xOffset", -1, 1, 0.01).onChange((value) => { setSpecProp("xOffset", value); });
-      displayGUI.add(currentSpec, "yOffset", -1, 1, 0.01).onChange((value) => { setSpecProp("yOffset", value); });      
-      displayGUI.add(screens, "image", Object.keys(images)).onChange((value) => { setImage(value); });      
+      const displayGUI = gui.addFolder('Display');
+      displayGUI.add(currentSpec, 'fov', 0.1, 10, 0.01).name('Virtual FoV').onChange((value) => { setSpecProp('fov', value); });
+      displayGUI.add(currentSpec, 'xOffset', -1, 1, 0.01).name('X Offset').onChange((value) => { setSpecProp('xOffset', value); });
+      displayGUI.add(currentSpec, 'yOffset', -1, 1, 0.01).name('Y Offset').onChange((value) => { setSpecProp('yOffset', value); });      
+      displayGUI.add(screens, 'image', Object.keys(images)).name('Game').onChange((value) => { setImage(value); });      
             
-      const screenGUI = gui.addFolder("Screens");
-      screenGUI.add(screens, "single");
-      screenGUI.add(screens, "size", Object.keys(specs)).onChange((value) => { setScreenSpec(specs[value]); });
-      screenGUI.add(currentSpec, "depth", 0, 3, 0.01).onChange((value) => { setSpecProp("depth", value); });
-      screenGUI.add(currentSpec, "angle", 0, Math.PI/2, 0.01).onChange((value) => { setSpecProp("angle", value); });
-      screenGUI.add(currentSpec, "spacing", 0, 80, 0.01).onChange((value) => { setSpecProp("spacing", value); });
-      screenGUI.add(currentSpec, "floorHeight", 0, 50, 0.01).onChange((value) => { setSpecProp("floorHeight", value); });
-      screenGUI.add(currentSpec, "z", -10, 40, 0.01).onChange((value) => { setSpecProp("z", value); });
-      screenGUI.add(currentSpec, "centerOffset", -30, 20, 0.01).onChange((value) => { setSpecProp("centerOffset", value); });
-      screenGUI.add(currentSpec, "bezel", 0, 5, 0.01).onChange((value) => { setSpecProp("bezel", value); });
-      screenGUI.add(screens, "wireframe");
+      const screenGUI = gui.addFolder('Screens');
+      screenGUI.add(screens, 'single').name('Single');
+      screenGUI.add(screens, 'size', Object.keys(specs)).name('Size').onChange((value) => { setScreenSpec(specs[value]); });
+      screenGUI.add(currentSpec, 'depth', 0, 3, 0.01).name('Depth').onChange((value) => { setSpecProp('depth', value); });
+      screenGUI.add(currentSpec, 'angle', 0, Math.PI/2, 0.01).name('Sides Angle').onChange((value) => { setSpecProp('angle', value); });
+      screenGUI.add(currentSpec, 'spacing', 0, 80, 0.01).name('Spacing').onChange((value) => { setSpecProp('spacing', value); });
+      screenGUI.add(currentSpec, 'floorHeight', 0, 50, 0.01).name('Floor Height').onChange((value) => { setSpecProp('floorHeight', value); });
+      screenGUI.add(currentSpec, 'z', -10, 40, 0.01).name('Distance').onChange((value) => { setSpecProp('z', value); });
+      screenGUI.add(currentSpec, 'centerOffset', -30, 20, 0.01).name('Center Offset').onChange((value) => { setSpecProp('centerOffset', value); });
+      screenGUI.add(currentSpec, 'bezel', 0, 5, 0.01).name('Bezel').onChange((value) => { setSpecProp('bezel', value); });
+      screenGUI.add(screens, 'wireframe').name('Wireframe');
       
-      const camGUI = gui.addFolder("Camera");
+      const camGUI = gui.addFolder('Camera');
       
       const camSelect = { view: Object.keys(cams)[0] };
-      camGUI.add(camSelect, "view", Object.keys(cams)).onChange((value) => {
+      camGUI.add(camSelect, 'view', Object.keys(cams)).name('View').onChange((value) => {
         setCamera(cams[value]);
       });
-      camGUI.add(camera, "fov", 20, 120).onChange((value) => {
+      camGUI.add(camera, 'fov', 20, 120).name('FoV').onChange((value) => {
         camera.updateProjectionMatrix();
       });
       
-      const camPosGUI = camGUI.addFolder("Position");
-      camPosGUI.add(camera.position, "x", -40, 40);
-      camPosGUI.add(camera.position, "y", -40, 40);
-      camPosGUI.add(camera.position, "z", -40, 80);
+      const camPosGUI = camGUI.addFolder('Position');
+      camPosGUI.add(camera.position, 'x', -100, 100).name('X');
+      camPosGUI.add(camera.position, 'y', -100, 100).name('Y');
+      camPosGUI.add(camera.position, 'z', -100, 100).name('Z');
       
-      const camRotGUI = camGUI.addFolder("Rotation");
-      camRotGUI.add(camera.rotation, "x", -Math.PI, Math.PI);
-      camRotGUI.add(camera.rotation, "y", -Math.PI, Math.PI);
-      camRotGUI.add(camera.rotation, "z", -Math.PI, Math.PI);
+      const camRotGUI = camGUI.addFolder('Rotation');
+      camRotGUI.add(camera.rotation, 'x', -Math.PI, Math.PI).name('Z');
+      camRotGUI.add(camera.rotation, 'y', -Math.PI, Math.PI).name('Y');
+      camRotGUI.add(camera.rotation, 'z', -Math.PI, Math.PI).name('Z');
 
-      const rigModelPath = cdnPath + "rig3.stl";
+      const rigModelPath = cdnPath + 'rig3.stl';
       let rig = null;
 
       const stlLoader = new STLLoader();
@@ -225,14 +225,18 @@
           mesh.position.z = 40;
           scene.add(mesh);
           rig = mesh;
-          const rigGUI = gui.addFolder("Rig");
-          rigGUI.add(rig.position, "z", -20, 80);
+          const rigGUI = gui.addFolder('Rig');
+          rigGUI.add(rig, 'visible').name('Visible');
+          const rigPosGUI = rigGUI.addFolder('Position');
+          rigPosGUI.add(rig.position, 'x', -100, 100).name('X');
+          rigPosGUI.add(rig.position, 'y', -100, 100).name('Y');
+          rigPosGUI.add(rig.position, 'z', -100, 100).name('Z');          
         },
         (xhr) => {
-          loaderEl.innerHTML = Math.round((xhr.loaded / xhr.total) * 100) + "% LOADED";
+          loaderEl.innerHTML = Math.round((xhr.loaded / xhr.total) * 100) + '% LOADED';
         },
         (error) => {
-          loaderEl.innerHTML = "Error loading model."
+          loaderEl.innerHTML = 'Error loading model.'
           setTimeout(() => { endLoad(); }, 5000);
           console.log(error);
         }
@@ -268,13 +272,13 @@
       
       function startLoad() {
         loadingCount++;
-        loaderEl.style.display = "block";
+        loaderEl.style.display = 'block';
       }
       
       function endLoad() {
         loadingCount--;
         if(loadingCount === 0)
-          loaderEl.style.display = "none";
+          loaderEl.style.display = 'none';
       }
 
       function setCamera(cam) {
@@ -325,7 +329,7 @@
         animate();
       });
 
-      window.addEventListener("resize", onWindowResize, false);
+      window.addEventListener('resize', onWindowResize, false);
 
       function onWindowResize() {
         camera.aspect = window.innerWidth / window.innerHeight;
