@@ -64,7 +64,7 @@
         1000
       );
       
-      const renderer = new THREE.WebGLRenderer();
+      const renderer = new THREE.WebGLRenderer({ antialias: true });
       renderer.setSize(window.innerWidth, window.innerHeight);
       document.body.appendChild(renderer.domElement);
       
@@ -73,10 +73,10 @@
 
       const controls = new OrbitControls(camera, renderer.domElement);
       
-      const wireMaterial = new THREE.MeshBasicMaterial({
+      const wireMaterial = new THREE.MeshPhongMaterial({
         color: 0x88ff88,
         transparent: true,
-        opacity: 0.25,
+        opacity: 0.2,
       });
       
       const cdnPath = 'https://cdn.glitch.global/710b4225-853b-4ba5-bd3d-1a005f44407d/';
@@ -163,13 +163,36 @@
       scene.add(screen1);
       scene.add(screen2);
       scene.add(screen3);
-
+      
       let screens = {
         size: defaultSize,
-        wireframe: false,
         single: false,
         image: images
       };
+      
+      const pLight = new THREE.PointLight(0xffffff, 1.5, 100, 2);
+      pLight.position.set(10, 10, 50);
+      scene.add(pLight);
+
+      const aLight = new THREE.AmbientLight(0x404040, 1.5);
+      scene.add(aLight);
+      
+      let sceneConfig = {
+        wireframe: false,
+        wireMaterial: wireMaterial
+      };
+      
+      const sceneGUI = gui.addFolder('Scene');
+      sceneGUI.add(sceneConfig, 'wireframe').name('X-Ray').onChange((value) => { setXRay(value); });;
+      sceneGUI.add(sceneConfig.wireMaterial, 'opacity', 0.1, 0.5, 0.01).name('Opacity');
+      sceneGUI.add(aLight, 'intensity', 0, 5, 0.01).name('Ambient Light');
+      
+      const pLightGUI = sceneGUI.addFolder('Point Light');
+      pLightGUI.add(pLight, 'intensity', 0, 5, 0.01).name('Intensity');
+      pLightGUI.add(pLight.position, 'x', -100, 100, 0.1).name('X');
+      pLightGUI.add(pLight.position, 'y', -100, 100, 0.1).name('Y');
+      pLightGUI.add(pLight.position, 'z', -100, 100, 0.1).name('Z');
+      pLightGUI.addColor(pLight, 'color').name('Color');
       
       const displayGUI = gui.addFolder('Display');
       displayGUI.add(currentSpec, 'fov', 0.1, 10, 0.01).name('Virtual FoV').onChange((value) => { setSpecProp('fov', value); });
@@ -178,7 +201,7 @@
       displayGUI.add(screens, 'image', Object.keys(images)).name('Game').onChange((value) => { setImage(value); });      
             
       const screenGUI = gui.addFolder('Screens');
-      screenGUI.add(screens, 'single').name('Single');
+      screenGUI.add(screens, 'single').name('Single').onChange((value) => { setScreensSingle(value); });;
       screenGUI.add(screens, 'size', Object.keys(specs)).name('Size').onChange((value) => { setScreenSpec(specs[value]); });
       screenGUI.add(currentSpec, 'depth', 0, 3, 0.01).name('Depth').onChange((value) => { setSpecProp('depth', value); });
       screenGUI.add(currentSpec, 'angle', 0, Math.PI/2, 0.01).name('Sides Angle').onChange((value) => { setSpecProp('angle', value); });
@@ -187,7 +210,6 @@
       screenGUI.add(currentSpec, 'z', -10, 40, 0.01).name('Distance').onChange((value) => { setSpecProp('z', value); });
       screenGUI.add(currentSpec, 'centerOffset', -30, 20, 0.01).name('Center Offset').onChange((value) => { setSpecProp('centerOffset', value); });
       screenGUI.add(currentSpec, 'bezel', 0, 5, 0.01).name('Bezel').onChange((value) => { setSpecProp('bezel', value); });
-      screenGUI.add(screens, 'wireframe').name('Wireframe');
       
       const camGUI = gui.addFolder('Camera');
       
@@ -200,17 +222,21 @@
       });
       
       const camPosGUI = camGUI.addFolder('Position');
-      camPosGUI.add(camera.position, 'x', -100, 100).name('X');
-      camPosGUI.add(camera.position, 'y', -100, 100).name('Y');
-      camPosGUI.add(camera.position, 'z', -100, 100).name('Z');
+      camPosGUI.add(camera.position, 'x', -100, 100).name('X').listen();
+      camPosGUI.add(camera.position, 'y', -100, 100).name('Y').listen();
+      camPosGUI.add(camera.position, 'z', -100, 100).name('Z').listen();
       
       const camRotGUI = camGUI.addFolder('Rotation');
-      camRotGUI.add(camera.rotation, 'x', -Math.PI, Math.PI).name('Z');
-      camRotGUI.add(camera.rotation, 'y', -Math.PI, Math.PI).name('Y');
-      camRotGUI.add(camera.rotation, 'z', -Math.PI, Math.PI).name('Z');
+      camRotGUI.add(camera.rotation, 'x', -Math.PI, Math.PI).name('Z').listen();
+      camRotGUI.add(camera.rotation, 'y', -Math.PI, Math.PI).name('Y').listen();
+      camRotGUI.add(camera.rotation, 'z', -Math.PI, Math.PI).name('Z').listen();
 
       const rigModelPath = cdnPath + 'rig3.stl';
       let rig = null;
+      
+      const plasticMaterial = new THREE.MeshPhongMaterial({
+        color: 0x222222,
+      });
 
       const stlLoader = new STLLoader();
       startLoad();
@@ -218,7 +244,7 @@
         rigModelPath,
         (geometry) => {
           setTimeout(() => { endLoad(); }, 1000);
-          const mesh = new THREE.Mesh(geometry, wireMaterial);
+          const mesh = new THREE.Mesh(geometry, plasticMaterial);
           mesh.rotation.x = -Math.PI / 2;
           mesh.rotation.z = Math.PI / 2;
           mesh.position.x = 12;
@@ -240,7 +266,33 @@
           setTimeout(() => { endLoad(); }, 5000);
           console.log(error);
         }
-      );      
+      );    
+      
+      function setScreensSingle(single) {
+         if(single) {
+          screen1.visible = false;
+          screen3.visible = false;
+        }
+        else {
+          screen1.visible = true;
+          screen3.visible = true;
+        }
+      }
+      
+      function setXRay(on) {
+        if(on) {
+          screen1.material = wireMaterial;
+          screen2.material = wireMaterial;
+          screen3.material = wireMaterial;
+          rig.material = wireMaterial;
+        }
+        else {
+          screen1.material = plasticMaterial;
+          screen2.material = plasticMaterial;
+          screen3.material = plasticMaterial;
+          rig.material = plasticMaterial;
+        }
+      }
       
       function setImage(name) {
         screen1.setImage(images[name].left);
@@ -296,31 +348,12 @@
           currentSpec.floorHeight,
           currentSpec.z + currentSpec.centerOffset
         );
-        if (!screens.wireframe)
-          screen2.material = screen2.defaultMaterial;
         
-        if(!screens.single) {    
-          screen1.visible = true;
-          screen3.visible = true;
-        
-          screen1.rotation.y = currentSpec.angle * -1;
-          screen3.rotation.y = currentSpec.angle;
+        screen1.rotation.y = currentSpec.angle * -1;
+        screen3.rotation.y = currentSpec.angle;
 
-          screen1.position.set(currentSpec.spacing, currentSpec.floorHeight, currentSpec.z);
-          screen3.position.set(-currentSpec.spacing, currentSpec.floorHeight, currentSpec.z);
-
-          if (!screens.wireframe) {
-            screen1.material = screen1.defaultMaterial;
-            screen3.material = screen3.defaultMaterial;
-          } 
-          else 
-            screen1.material = screen2.material = screen3.material = wireMaterial;
-          
-        }
-        else {
-          screen1.visible = false;
-          screen3.visible = false;
-        }
+        screen1.position.set(currentSpec.spacing, currentSpec.floorHeight, currentSpec.z);
+        screen3.position.set(-currentSpec.spacing, currentSpec.floorHeight, currentSpec.z);          
         
         renderer.render(scene, camera);
       }
