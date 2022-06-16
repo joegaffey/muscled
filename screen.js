@@ -14,23 +14,25 @@ export default class Screen extends THREE.Mesh {
     this.spec = spec;
        
     this.geometry = new THREE.BoxGeometry(this.spec.width, this.spec.height, this.spec.depth);
-    this.plasticMaterial = new THREE.MeshBasicMaterial({
+    const plasticMaterial = new THREE.MeshPhongMaterial({
       color: 0x222222,
     });
     
-    this.defaultMaterial = this.material = this.plasticMaterial;
+    this.material = plasticMaterial;
     this.img = this.getLoadingImage();
     
     const dTexture = new THREE.CanvasTexture(this.img);
     const dMaterial = new THREE.MeshBasicMaterial({
       map: dTexture,
+      // emmissive: 0xffffff,
+      // emmissiveIntensity: 1000,
     });
         
     const dGeometry = new THREE.PlaneGeometry(this.spec.width - this.spec.bezel, this.spec.height - this.spec.bezel);
     this.display = new THREE.Mesh(dGeometry, dMaterial);
     this.display.position.x = this.position.x;
     this.display.position.y = this.position.y;
-    this.display.position.z = this.position.z + this.spec.depth;
+    this.display.position.z = this.position.z + this.spec.depth + 0.1;
     this.display.material = dMaterial;    
     this.add(this.display);
        
@@ -82,7 +84,7 @@ export default class Screen extends THREE.Mesh {
         
     this.display.geometry.dispose();
     this.display.geometry = new THREE.PlaneGeometry(this.spec.width - this.spec.bezel, this.spec.height - this.spec.bezel);
-    this.display.position.z = this.spec.depth / 2 + 0.01;
+    this.display.position.z = this.spec.depth / 2 + 0.1;
     
     const tex = this.display.material.map;
     
