@@ -8,7 +8,7 @@
       body {
         margin: 0;
       }
-      .loader {
+      .loader {       
         font-family: verdana;
         font-size: 24px;
         display: none;
@@ -20,6 +20,14 @@
         text-align: center;
         padding: 30px 0;
         background-color: #222222;
+        color: lightgray;
+      }
+      .distance {
+        font-family: verdana;
+        font-size: 24px;
+        position: absolute;
+        top: 20px;
+        left: 20px;
         color: lightgray;
       }
     </style>
@@ -36,7 +44,7 @@
           "vrButton": "./lib/VRButton.js",
           "screen": "./screen.js"
         }
-      }
+      }      
     </script>
     <script type="text/javascript" src="./lib/dat.gui.min.js"></script>
   </head>
@@ -44,6 +52,8 @@
     <div class="loader">
       Loading...
     </div>
+    <div class="distance"></div>
+    
     <script type="module">
       import * as THREE from 'three';
       import { OrbitControls } from 'orbitControls';
@@ -55,6 +65,7 @@
       
       let loadingCount = 0;
       const loaderEl = document.querySelector('.loader');
+      const distEl = document.querySelector('.distance');
 
       const scene = new THREE.Scene();
       const camera = new THREE.PerspectiveCamera(
@@ -120,6 +131,8 @@
       };
             
       const sf = 0.75;
+      
+      const plColor = 0xffff00;
 
       // prettier-ignore
       const specs = { 
@@ -266,7 +279,82 @@
           setTimeout(() => { endLoad(); }, 5000);
           console.log(error);
         }
-      );    
+      );
+      
+      const raycaster = new THREE.Raycaster();
+      const pointer = new THREE.Vector2();
+      
+      let isDown = false;
+      let isDrag = false;
+
+      function onPointerMove(event) {
+        pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
+        pointer.y = - (event.clientY / window.innerHeight) * 2 + 1;
+        
+        if(isDown)
+          isDrag = true;
+        else
+          isDrag = false;
+      }
+      window.addEventListener('pointermove', onPointerMove);
+      
+      let line = null;
+      
+      function clearSelected() {
+        selectedPoints.forEach(p => {
+          p.visible = false;
+        });
+        scene.remove(line);
+        selectedPoints.length = 0;
+        distEl.innerHTML = '';
+      }
+      
+      function onPointerUp() {
+        isDown = false;
+        if(isDrag)
+          return;
+        
+        if(hoveredPoints.length === 0) {
+          clearSelected();
+        }
+        if(selectedPoints.length === 2 && hoveredPoints.length > 0) {
+          clearSelected();
+        }
+        if(hoveredPoints.length > 0)
+          selectedPoints.push(hoveredPoints[0]);
+        if(selectedPoints.length === 2) {
+          const p1 = new THREE.Vector3();
+          const p2 = new THREE.Vector3();
+          selectedPoints[0].getWorldPosition(p1);
+          selectedPoints[1].getWorldPosition(p2);          
+          distEl.innerHTML = Math.round(p1.distanceTo(p2) / sf * 100) / 100 + '"';
+          const material = new THREE.MeshBasicMaterial( { color: plColor } );
+          const tubeGeometry = new THREE.TubeGeometry(new THREE.CatmullRomCurve3([p1, p2]), 512, 0.1, 8, false);
+          line = new THREE.Line(tubeGeometry, material);
+          scene.add(line);
+        }
+      }
+      window.addEventListener('pointerup', onPointerUp);
+      
+      function onPointerDown() {
+        isDown = true;
+      }      
+      window.addEventListener('pointerdown', onPointerDown);
+                  
+      addPoint(0, 25, 35);
+            
+      function addPoint(x, y, z, name) {
+        const geometry = new THREE.SphereGeometry(0.5, 32, 16);
+        const material = new THREE.MeshBasicMaterial({ color: plColor });
+        const sphere = new THREE.Mesh(geometry, material);
+        sphere.position.x = x;
+        sphere.position.y = y;
+        sphere.position.z = z;
+        sphere.visible = false;
+        sphere.isControlPoint = true;
+        scene.add(sphere);
+        return sphere;
+      }
       
       function setScreensSingle(single) {
          if(single) {
@@ -342,6 +430,8 @@
         document.activeElement.blur();
       }
       
+      let selectedPoint = null;
+      
       function animate() {
         screen2.position.set(
           0,
@@ -353,12 +443,42 @@
         screen3.rotation.y = currentSpec.angle;
 
         screen1.position.set(currentSpec.spacing, currentSpec.floorHeight, currentSpec.z);
-        screen3.position.set(-currentSpec.spacing, currentSpec.floorHeight, currentSpec.z);          
+        screen3.position.set(-currentSpec.spacing, currentSpec.floorHeight, currentSpec.z);   
+        
+        if(selectedPoint)
+          selectedPoint.material.color.set(0xff0000);
+        
+        selectedPoints.forEach(point => {
+          point.visible = true;
+        });
         
         renderer.render(scene, camera);
       }
       
+      const selectedPoints = [];
+      const hoveredPoints = [];
+      
+      function updateRaycaster() {
+        hoveredPoints.forEach(point => {
+          point.visible = false;
+        });
+        hoveredPoints.length = 0;
+        
+        raycaster.setFromCamera(pointer, camera);
+        const intersects = raycaster.intersectObjects(scene.children, true);
+
+        for ( let i = 0; i < intersects.length; i ++ ) {
+          const obj = intersects[i].object;
+          if(obj.isControlPoint) {
+            hoveredPoints.push(obj);
+            obj.visible = true;
+            return;
+          }
+        }
+      }
+      
       renderer.setAnimationLoop(() => {
+        //updateRaycaster();
         animate();
       });
 

@@ -35,12 +35,36 @@ export default class Screen extends THREE.Mesh {
     this.display.position.z = this.position.z + this.spec.depth + 0.1;
     this.display.material = dMaterial;    
     this.add(this.display);
-       
+    
+    this.pGroup = new THREE.Object3D();
+    this.add(this.pGroup);
+    this.addPoints();
+           
     this.offset = Screen.OFFSETS[placement];
     if(this.offset || this.offset === 0)
       this.setImageOffset(this.offset);
     
     this.setImage(background);
+  }
+  
+  addPoints() {
+    this.addPoint(0, 0); 
+    this.addPoint(1, 1); 
+    this.addPoint(-1, -1);
+    this.addPoint(1, -1);
+    this.addPoint(-1, 1);
+  }
+  
+  addPoint(x, y) {
+    const geometry = new THREE.SphereGeometry(0.5, 32, 16);
+    const material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
+    const sphere = new THREE.Mesh( geometry, material );
+    sphere.position.x = this.position.x + this.spec.width / 2 * x;
+    sphere.position.y = this.position.y + this.spec.height / 2 * y;
+    sphere.position.z = this.position.z + this.spec.depth + 0.1;
+    sphere.isControlPoint = true;
+    sphere.visible = false;
+    this.pGroup.add(sphere);
   }
   
   getLoadingImage() {
@@ -86,8 +110,12 @@ export default class Screen extends THREE.Mesh {
     this.display.geometry = new THREE.PlaneGeometry(this.spec.width - this.spec.bezel, this.spec.height - this.spec.bezel);
     this.display.position.z = this.spec.depth / 2 + 0.1;
     
-    const tex = this.display.material.map;
+    // this.pGroup.clear();
+    // console.log(this.pGroup)
+    this.addPoints();
     
+    const tex = this.display.material.map;
+        
     if(tex.image && this.img) {      
       const imgAspect = tex.image.width / tex.image.height;
       const screenAspect = this.spec.xAspect / this.spec.yAspect;
