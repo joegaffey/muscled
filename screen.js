@@ -36,9 +36,8 @@ export default class Screen extends THREE.Mesh {
     this.display.material = dMaterial;    
     this.add(this.display);
     
-    this.pGroup = new THREE.Object3D();
-    this.add(this.pGroup);
     this.addPoints();
+    this.positionPoints();
            
     this.offset = Screen.OFFSETS[placement];
     if(this.offset || this.offset === 0)
@@ -48,23 +47,34 @@ export default class Screen extends THREE.Mesh {
   }
   
   addPoints() {
-    this.addPoint(0, 0); 
-    this.addPoint(1, 1); 
-    this.addPoint(-1, -1);
-    this.addPoint(1, -1);
-    this.addPoint(-1, 1);
+    this.points = [];
+    for(let i = 0; i < 5; i++)
+      this.addPoint();
   }
   
-  addPoint(x, y) {
+  positionPoint(point, x, y) {
+    point.geometry = new THREE.SphereGeometry(0.5, 32, 16);
+    point.position.x = this.spec.width / 2 * x;
+    point.position.y = this.spec.height / 2 * y;
+    point.position.z = this.spec.depth + 0.2;
+  }
+  
+  positionPoints() {
+    this.positionPoint(this.points[0], 0, 0);
+    this.positionPoint(this.points[1], 1, 1);
+    this.positionPoint(this.points[2], -1, -1);
+    this.positionPoint(this.points[3], 1, -1);
+    this.positionPoint(this.points[4], -1, 1);
+  }
+  
+  addPoint() {
     const geometry = new THREE.SphereGeometry(0.5, 32, 16);
-    const material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
-    const sphere = new THREE.Mesh( geometry, material );
-    sphere.position.x = this.position.x + this.spec.width / 2 * x;
-    sphere.position.y = this.position.y + this.spec.height / 2 * y;
-    sphere.position.z = this.position.z + this.spec.depth + 0.1;
+    const material = new THREE.MeshBasicMaterial({ color: 0xffff00 });
+    const sphere = new THREE.Mesh(geometry, material);
     sphere.isControlPoint = true;
     sphere.visible = false;
-    this.pGroup.add(sphere);
+    this.add(sphere);
+    this.points.push(sphere);
   }
   
   getLoadingImage() {
@@ -110,9 +120,7 @@ export default class Screen extends THREE.Mesh {
     this.display.geometry = new THREE.PlaneGeometry(this.spec.width - this.spec.bezel, this.spec.height - this.spec.bezel);
     this.display.position.z = this.spec.depth / 2 + 0.1;
     
-    // this.pGroup.clear();
-    // console.log(this.pGroup)
-    this.addPoints();
+    this.positionPoints();
     
     const tex = this.display.material.map;
         
@@ -132,7 +140,7 @@ export default class Screen extends THREE.Mesh {
                     (1 - this.spec.fov / yAdjust) / 2 * tex.image.height + this.spec.yOffset * tex.image.height, 
                     tex.image.width * this.spec.fov,
                     tex.image.height * this.spec.fov / yAdjust);
-    
+      
       tex.needsUpdate = true;
     }
   }
