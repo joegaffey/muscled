@@ -220,9 +220,9 @@
       const aLight = new THREE.AmbientLight(0x404040, 1.5);
       scene.add(aLight);
       
-      let sceneConfig = {
+      const sceneConfig = {
         wireframe: false,
-        wireMaterial: wireMaterial
+        wireMaterial: wireMaterial,
       };
       
       const sceneGUI = gui.addFolder('Scene');
@@ -273,6 +273,18 @@
       camRotGUI.add(camera.rotation, 'x', -Math.PI, Math.PI).name('Z').listen();
       camRotGUI.add(camera.rotation, 'y', -Math.PI, Math.PI).name('Y').listen();
       camRotGUI.add(camera.rotation, 'z', -Math.PI, Math.PI).name('Z').listen();
+      
+      const measure = {
+        on: true,
+        units: ['Inches', 'CM'],
+        selectedUnit: 'CM'
+      };
+      
+      const measureGUI = gui.addFolder('Measurements');
+      measureGUI.add(measure, 'on').name('On');      
+      measureGUI.add(measure, 'units', measure.units).name('Units').onChange((value) => {
+        measure.selectedUnit = value;
+      });      
 
       const rigModelPath = cdnPath + 'rig3.stl';
       let rig = null;
@@ -339,6 +351,14 @@
         distEl.innerHTML = '';
       }
       
+      function setDistanceText(distance) {
+        distance = Math.round(distance * 100) / 100;
+        if(measure.selectedUnit === "CM")
+          distEl.innerHTML = distance * 2.5 + 'cm';
+        else
+          distEl.innerHTML = distance + '"';
+      }
+      
       function onPointerUp() {
         isDown = false;
         if(isDrag)
@@ -357,7 +377,7 @@
           const p2 = new THREE.Vector3();
           selectedPoints[0].getWorldPosition(p1);
           selectedPoints[1].getWorldPosition(p2);          
-          distEl.innerHTML = Math.round(p1.distanceTo(p2) * 100) / 100 + '"';
+          setDistanceText(p1.distanceTo(p2));
           const material = new THREE.MeshBasicMaterial( { color: plColor } );
           const tubeGeometry = new THREE.TubeGeometry(new THREE.CatmullRomCurve3([p1, p2]), 512, 0.1, 8, false);
           line = new THREE.Line(tubeGeometry, material);
@@ -508,7 +528,8 @@
       }
       
       renderer.setAnimationLoop(() => {
-        updateRaycaster();
+        if(measure.on)
+          updateRaycaster();
         animate();
       });
 
