@@ -60,6 +60,14 @@
       import STLLoader from 'stlLoader';
       import Screen from 'screen';
       // import { VRButton } from 'vrButton';
+      
+      const RIG_X = 12;
+      const RIG_Y = 0;
+      const RIG_Z = 40;
+      
+      const DP_X = 0;
+      const DP_Y = 25;
+      const DP_Z = 35;
 
       const gui = new dat.GUI();
       
@@ -196,17 +204,37 @@
       setCamera(Object.values(cams)[0]);
       
       const defaultSize = '32" 16x9';
-      const currentSpec = {}
+      const currentSpec = {};
       setCurrentSpec(specs[defaultSize]);
      
       const screen1 = new Screen(currentSpec, images['Project Cars 2'].left, 'left');
       const screen2 = new Screen(currentSpec, images['Project Cars 2'].middle, 'middle');
       const screen3 = new Screen(currentSpec, images['Project Cars 2'].right, 'right');
       
-      scene.add(screen1);
-      scene.add(screen2);
-      scene.add(screen3);
+      const screenGroup = new THREE.Group();
+      const screenBounds = new THREE.Box3();
       
+      screenGroup.add(screen1);
+      screenGroup.add(screen2);
+      screenGroup.add(screen3);
+      
+      screenBounds.setFromObject(screenGroup);
+      const low = screenBounds.min;
+      const high = screenBounds.max;
+      
+      const bbPoints = [];      
+      bbPoints.push(addPoint(low.x, low.y, low.z));
+      bbPoints.push(addPoint(high.x, low.y, low.z));
+      bbPoints.push(addPoint(low.x, high.y, low.z));
+      bbPoints.push(addPoint(low.x, low.y, high.z));
+      bbPoints.push(addPoint(high.x, high.y, low.z));
+      bbPoints.push(addPoint(high.x, low.y, high.z));
+      bbPoints.push(addPoint(low.x, high.y, high.z));
+      bbPoints.push(addPoint(high.x, high.y, high.z));
+      
+      scene.add(screenGroup);      
+      const screenPoints = [];
+                  
       let screens = {
         size: defaultSize,
         single: false,
@@ -275,16 +303,21 @@
       camRotGUI.add(camera.rotation, 'z', -Math.PI, Math.PI).name('Z').listen();
       
       const measure = {
-        on: true,
+        on: false,
         units: ['Inches', 'CM'],
-        selectedUnit: 'CM'
+        selectedUnit: 'CM',
+        screenModes: ['Individual', 'Combined'],
+        selectedScreenMode: 'Individual',
       };
       
       const measureGUI = gui.addFolder('Measurements');
       measureGUI.add(measure, 'on').name('On');      
       measureGUI.add(measure, 'units', measure.units).name('Units').onChange((value) => {
         measure.selectedUnit = value;
-      });      
+      });     
+      measureGUI.add(measure, 'screenModes', measure.screenModes).name('Screens').onChange((value) => {
+        measure.selectedScreenMode = value;
+      });
 
       const rigModelPath = cdnPath + 'rig3.stl';
       let rig = null;
@@ -292,26 +325,32 @@
       const plasticMaterial = new THREE.MeshPhongMaterial({
         color: 0x222222,
       });
-
+      
+      let rigBox = null;
+      
       const stlLoader = new STLLoader();
       startLoad();
       stlLoader.load(
         rigModelPath,
         (geometry) => {
           setTimeout(() => { endLoad(); }, 1000);
-          const mesh = new THREE.Mesh(geometry, plasticMaterial);
-          mesh.rotation.x = -Math.PI / 2;
-          mesh.rotation.z = Math.PI / 2;
-          mesh.position.x = 12;
-          mesh.position.z = 40;
-          scene.add(mesh);
-          rig = mesh;
+          const rig = new THREE.Mesh(geometry, plasticMaterial);
+          rig.rotation.x = -Math.PI / 2;
+          rig.rotation.z = Math.PI / 2;
+          rig.position.x = RIG_X;
+          rig.position.y = RIG_Y;
+          rig.position.z = RIG_Z;
+          scene.add(rig);
+          rigBox = new THREE.Box3().setFromObject(rig);
+          
           const rigGUI = gui.addFolder('Rig');
           rigGUI.add(rig, 'visible').name('Visible');
+          
           const rigPosGUI = rigGUI.addFolder('Position');
-          rigPosGUI.add(rig.position, 'x', -100, 100).name('X');
-          rigPosGUI.add(rig.position, 'y', -100, 100).name('Y');
-          rigPosGUI.add(rig.position, 'z', -100, 100).name('Z');          
+          rigPosGUI.add(rig.position, 'x', -100, 100).name('X').onChange((value) => { updateRigPos(); });
+          rigPosGUI.add(rig.position, 'y', -100, 100).name('Y').onChange((value) => { updateRigPos(); });
+          rigPosGUI.add(rig.position, 'z', -100, 100).name('Z').onChange((value) => { updateRigPos(); });
+          
         },
         (xhr) => {
           loaderEl.innerHTML = Math.round((xhr.loaded / xhr.total) * 100) + '% LOADED';
@@ -328,7 +367,7 @@
       
       let isDown = false;
       let isDrag = false;
-
+      
       function onPointerMove(event) {
         pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
         pointer.y = - (event.clientY / window.innerHeight) * 2 + 1;
@@ -351,12 +390,18 @@
         distEl.innerHTML = '';
       }
       
+      function updateRigPos() {
+        driverPoint.position.x = rig.position.x - RIG_X;
+        driverPoint.position.y = rig.position.y + DP_Y;
+        driverPoint.position.z = rig.position.z - RIG_Z + DP_Z;
+        rigBox = new THREE.Box3().setFromObject(rig);
+      }
+      
       function setDistanceText(distance) {
-        distance = Math.round(distance * 100) / 100;
         if(measure.selectedUnit === "CM")
-          distEl.innerHTML = distance * 2.5 + 'cm';
+          distEl.innerHTML = (distance * 2.5).toFixed(2) + 'cm';
         else
-          distEl.innerHTML = distance + '"';
+          distEl.innerHTML = distance.toFixed(2) + '"';
       }
       
       function onPointerUp() {
@@ -370,8 +415,9 @@
         if(selectedPoints.length === 2 && hoveredPoints.length > 0) {
           clearSelected();
         }
-        if(hoveredPoints.length > 0)
+        if(hoveredPoints.length > 0) {
           selectedPoints.push(hoveredPoints[0]);
+        }
         if(selectedPoints.length === 2) {
           const p1 = new THREE.Vector3();
           const p2 = new THREE.Vector3();
@@ -391,9 +437,9 @@
       }      
       window.addEventListener('pointerdown', onPointerDown);
                   
-      addPoint(0, 25, 35);
+      const driverPoint = addPoint(DP_X, DP_Y, DP_Z);
             
-      function addPoint(x, y, z, name) {
+      function addPoint(x, y, z) {
         const geometry = new THREE.SphereGeometry(0.5, 32, 16);
         const material = new THREE.MeshBasicMaterial({ color: plColor });
         const sphere = new THREE.Mesh(geometry, material);
@@ -407,7 +453,7 @@
       }
       
       function setScreensSingle(single) {
-         if(single) {
+        if(single) {
           screen1.visible = false;
           screen3.visible = false;
         }
@@ -452,6 +498,38 @@
         screen2.setSpec(currentSpec);
         screen3.setSpec(currentSpec);
         document.activeElement.blur();
+        updateBoundsPoints();
+        upDateScreenPoints();
+      }
+      
+      function upDateScreenPoints() {
+        screenPoints.forEach(point => { 
+          scene.remove(point);        
+        });
+        screenPoints.length = 0;        
+        screenPoints.push(...screen1.getPoints());
+        screenPoints.push(...screen2.getPoints());
+        screenPoints.push(...screen3.getPoints());
+      } 
+      
+      function updateBoundsPoints() {
+        screenBounds.setFromObject(screenGroup);
+        const low = screenBounds.min;
+        const high = screenBounds.max;
+        movePoint(bbPoints[0], low.x, low.y, low.z);
+        movePoint(bbPoints[1], high.x, low.y, low.z);
+        movePoint(bbPoints[2], low.x, high.y, low.z);
+        movePoint(bbPoints[3], low.x, low.y, high.z);
+        movePoint(bbPoints[4], high.x, high.y, low.z);
+        movePoint(bbPoints[5], high.x, low.y, high.z);
+        movePoint(bbPoints[6], low.x, high.y, high.z);
+        movePoint(bbPoints[7], high.x, high.y, high.z);
+      }
+      
+      function movePoint(point, x, y, z) {
+        point.position.x = x;
+        point.position.y = y; 
+        point.position.z = z;
       }
       
       function setCurrentSpec(spec) {
@@ -465,10 +543,16 @@
         loaderEl.style.display = 'block';
       }
       
+      let loaded = false;
+      
       function endLoad() {
         loadingCount--;
-        if(loadingCount === 0)
+        if(loadingCount === 0) {
+          loaded = true;
           loaderEl.style.display = 'none';
+          updateBoundsPoints(); 
+          upDateScreenPoints();
+        }
       }
 
       function setCamera(cam) {
@@ -515,20 +599,45 @@
         hoveredPoints.length = 0;
         
         raycaster.setFromCamera(pointer, camera);
-        const intersects = raycaster.intersectObjects(scene.children, true);
 
-        for ( let i = 0; i < intersects.length; i ++ ) {
+        let intersects = [];
+        
+        if(measure.selectedScreenMode === 'Combined')
+          intersects = raycaster.intersectObjects([...bbPoints], false);
+        else
+          intersects = raycaster.intersectObjects([...screenPoints, screen1, screen2, screen3, driverPoint], false);
+            
+        for (let i = 0; i < intersects.length; i ++) {
           const obj = intersects[i].object;
-          if(obj.isControlPoint) {
+          if(obj instanceof Screen) {
+            if(measure.selectedScreenMode === 'Individual') {
+              obj.getPoints().forEach(p => {
+                hoveredPoints.push(p);
+                p.visible = true;
+              });
+            }
+          }
+          else if(obj.isControlPoint) {
             hoveredPoints.push(obj);
             obj.visible = true;
-            return;
           }
+        }
+        
+        if(measure.selectedScreenMode === 'Combined' && raycaster.ray.intersectsBox(screenBounds)) {
+          bbPoints.forEach(p => {
+            hoveredPoints.push(p);
+            p.visible = true;
+          });
+        }
+        
+        if(raycaster.ray.intersectsBox(rigBox)) {
+          hoveredPoints.push(driverPoint);
+          driverPoint.visible = true;
         }
       }
       
       renderer.setAnimationLoop(() => {
-        if(measure.on)
+        if(measure.on && loaded)
           updateRaycaster();
         animate();
       });

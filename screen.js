@@ -77,6 +77,10 @@ export default class Screen extends THREE.Mesh {
     this.points.push(sphere);
   }
   
+  getPoints() {
+    return this.points;
+  }
+  
   getLoadingImage() {
     const canvas = document.createElement('canvas');
     canvas.width = this.spec.xAspect * 300;
