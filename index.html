@@ -159,7 +159,9 @@
         '65" 16x9': { xAspect: 16, yAspect: 9, diagonal: 65, fov: 1, floorHeight: 32, z: -8 },
         '75" 16x9': { xAspect: 16, yAspect: 9, diagonal: 75, fov: 1, floorHeight: 32.5, z: -15 },
         '85" 16x9': { xAspect: 16, yAspect: 9, diagonal: 85, fov: 1, floorHeight: 34, z: -22 },
-      }
+      };
+      
+      const urlParams = new URLSearchParams(window.location.hash.replace("#","?"));
       
       function processSpecs() {
         Object.keys(specs).forEach(key => {
@@ -173,9 +175,13 @@
           spec.bezel = 0.5;
           spec.xOffset = 0;
           spec.yOffset = 0;
-        })
+          
+          for (const [key, value] of urlParams.entries()) {
+            spec[key] = parseFloat(value);
+          }
+        });
       }
-      processSpecs();
+      processSpecs();      
       
       
       function getScreenWidth(xAspect, yAspect, diagonal) {
@@ -486,7 +492,9 @@
       
       function setSpecProp(name, value) {
         currentSpec[name] = value;
-        setScreenSpec(currentSpec);
+        setScreenSpec(currentSpec);        
+        urlParams.set(name, value);
+        window.location.hash = urlParams;
       }
                
       function setScreenSpec(spec) {
