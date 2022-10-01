@@ -211,6 +211,20 @@
       
       const defaultSize = '32" 16x9';
       const currentSpec = {};
+     
+      // if(urlParams.has('size')) {
+      //   // console.log(Object.keys(specs)[urlParams.get('screen')])
+      //   const size = urlParams.get('size');
+      //   const spec = specs[Object.keys(specs)[size]];
+      //   spec.size = size;
+      //   setCurrentSpec(spec);
+      // }
+      // else {
+      //   const spec = specs[defaultSize];
+      //   spec.size = defaultSize;
+      //   setCurrentSpec(spec);
+      // }
+      
       setCurrentSpec(specs[defaultSize]);
      
       const screen1 = new Screen(currentSpec, images['Project Cars 2'].left, 'left');
@@ -493,11 +507,15 @@
       function setSpecProp(name, value) {
         currentSpec[name] = value;
         setScreenSpec(currentSpec);        
-        urlParams.set(name, value);
+        urlParams.set(name, value.toFixed(2));
         window.location.hash = urlParams;
       }
                
       function setScreenSpec(spec) {
+        // console.log(spec)
+        // urlParams.set('size', spec[size]);
+        // window.location.hash = urlParams;
+        
         setCurrentSpec(spec);
         gui.updateDisplay();
         displayGUI.updateDisplay();
