@@ -354,7 +354,7 @@
         rigModelPath,
         (geometry) => {
           setTimeout(() => { endLoad(); }, 1000);
-          const rig = new THREE.Mesh(geometry, plasticMaterial);
+          rig = new THREE.Mesh(geometry, plasticMaterial);
           rig.rotation.x = -Math.PI / 2;
           rig.rotation.z = Math.PI / 2;
           rig.position.x = RIG_X;
