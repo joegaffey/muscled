@@ -12,7 +12,7 @@ export default class Screen extends THREE.Mesh {
     super();
     
     this.spec = spec;
-       
+    
     this.geometry = new THREE.BoxGeometry(this.spec.width, this.spec.height, this.spec.depth);
     const plasticMaterial = new THREE.MeshPhongMaterial({
       color: 0x222222,
