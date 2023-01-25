@@ -142,23 +142,23 @@
 
       // prettier-ignore
       const specs = { 
-        '19" 4x3': { xAspect: 4, yAspect: 3, diagonal: 19, fov: 1.35, floorHeight: 27.3, z: 16 },
-        '24" 16x9': { xAspect: 16, yAspect: 9, diagonal: 24, fov: 1, floorHeight: 27.5, z: 18 },
-        '27" 16x9': { xAspect: 16, yAspect: 9, diagonal: 27, fov: 1, floorHeight: 27.8, z: 18 },
-        '29" 21x9': { xAspect: 21, yAspect: 9, diagonal: 29, fov: 0.76, floorHeight: 27.2, z: 18 },
-        '32" 16x9': { xAspect: 16, yAspect: 9, diagonal: 32, fov: 1, floorHeight: 28.35, z: 12.28 },
-        '34" 21x9': { xAspect: 21, yAspect: 9, diagonal: 34, fov: 0.76, floorHeight: 27.8, z: 20 },
-        '40" 16x9': { xAspect: 16, yAspect: 9, diagonal: 40, fov: 1, floorHeight: 29.5, z: 9 },
-        '42" 16x9': { xAspect: 16, yAspect: 9, diagonal: 42, fov: 1, floorHeight: 29.5, z: 9 },
-        '43" 16x9': { xAspect: 16, yAspect: 9, diagonal: 43, fov: 1, floorHeight: 29.5, z: 6.2 },
-        '43" 32x9': { xAspect: 32, yAspect: 9, diagonal: 43, fov: 0.5, floorHeight: 27.4, z: 25 },
-        '49" 16x9': { xAspect: 16, yAspect: 9, diagonal: 49, fov: 1, floorHeight: 30, z: 2.5 },
-        '49" 32x9': { xAspect: 32, yAspect: 9, diagonal: 49, fov: 0.5, floorHeight: 28, z: 25 },
-        '50" 16x9': { xAspect: 16, yAspect: 9, diagonal: 50, fov: 1, floorHeight: 30.5, z: 0.5 },
-        '55" 16x9': { xAspect: 16, yAspect: 9, diagonal: 55, fov: 1, floorHeight: 31, z: -2.5 },
-        '65" 16x9': { xAspect: 16, yAspect: 9, diagonal: 65, fov: 1, floorHeight: 32, z: -8 },
-        '75" 16x9': { xAspect: 16, yAspect: 9, diagonal: 75, fov: 1, floorHeight: 32.5, z: -15 },
-        '85" 16x9': { xAspect: 16, yAspect: 9, diagonal: 85, fov: 1, floorHeight: 34, z: -22 },
+        '19" 4x3': { xAspect: 4, yAspect: 3, diagonal: 19, fov: 1.35, floorHeight: 27.3, z: 7 },
+        '24" 16x9': { xAspect: 16, yAspect: 9, diagonal: 24, fov: 1, floorHeight: 27.5, z: 7 },
+        '27" 16x9': { xAspect: 16, yAspect: 9, diagonal: 27, fov: 1, floorHeight: 27.8, z: 4 },
+        '29" 21x9': { xAspect: 21, yAspect: 9, diagonal: 29, fov: 0.76, floorHeight: 27.2, z: 7 },
+        '32" 16x9': { xAspect: 16, yAspect: 9, diagonal: 32, fov: 1, floorHeight: 28.35, z: -1 },
+        '34" 21x9': { xAspect: 21, yAspect: 9, diagonal: 34, fov: 0.76, floorHeight: 27.8, z: 5 },
+        '40" 16x9': { xAspect: 16, yAspect: 9, diagonal: 40, fov: 1, floorHeight: 29.5, z: -12 },
+        '42" 16x9': { xAspect: 16, yAspect: 9, diagonal: 42, fov: 1, floorHeight: 29.5, z: -12 },
+        '43" 16x9': { xAspect: 16, yAspect: 9, diagonal: 43, fov: 1, floorHeight: 29.5, z: -14 },
+        '43" 32x9': { xAspect: 32, yAspect: 9, diagonal: 43, fov: 0.5, floorHeight: 27.4, z: 8 },
+        '49" 16x9': { xAspect: 16, yAspect: 9, diagonal: 49, fov: 1, floorHeight: 30, z: -18 },
+        '49" 32x9': { xAspect: 32, yAspect: 9, diagonal: 49, fov: 0.5, floorHeight: 28, z: 7 },
+        '50" 16x9': { xAspect: 16, yAspect: 9, diagonal: 50, fov: 1, floorHeight: 30.5, z: -20 },
+        '55" 16x9': { xAspect: 16, yAspect: 9, diagonal: 55, fov: 1, floorHeight: 31, z: -24 },
+        '65" 16x9': { xAspect: 16, yAspect: 9, diagonal: 65, fov: 1, floorHeight: 32, z: -32 },
+        '75" 16x9': { xAspect: 16, yAspect: 9, diagonal: 75, fov: 1, floorHeight: 32.5, z: -44 },
+        '85" 16x9': { xAspect: 16, yAspect: 9, diagonal: 85, fov: 1, floorHeight: 34, z: -50 },
       };
       
       const urlParams = new URLSearchParams(window.location.hash.replace("#","?"));
@@ -168,9 +168,9 @@
           const spec = specs[key];
           spec.width = getScreenWidth(spec.xAspect, spec.yAspect, spec.diagonal);
           spec.height = getScreenHeight(spec.xAspect, spec.yAspect, spec.diagonal);
-          spec.spacing = spec.width / 2 * 1.7;
+          spec.spacing = spec.width / 2;
           spec.angle = Math.PI / 4;
-          spec.centerOffset = spec.diagonal / -3.1;
+          spec.centerOffset = 0;
           spec.depth = 0.5;
           spec.bezel = 0.5;
           spec.xOffset = 0;
@@ -238,6 +238,16 @@
       screenGroup.add(screen2);
       screenGroup.add(screen3);
       
+      const hinge1 = new THREE.Object3D();
+      hinge1.add(screen1);
+      hinge1.rotation.y = screen1.spec.angle * -1;
+      screen2.add(hinge1);
+      
+      const hinge2 = new THREE.Object3D();
+      hinge2.add(screen3);
+      hinge2.rotation.y = screen3.spec.angle;
+      screen2.add(hinge2);
+      
       screenBounds.setFromObject(screenGroup);
       const low = screenBounds.min;
       const high = screenBounds.max;
@@ -252,7 +262,10 @@
       bbPoints.push(addPoint(low.x, high.y, high.z));
       bbPoints.push(addPoint(high.x, high.y, high.z));
       
-      scene.add(screenGroup);      
+      // scene.add(screenGroup);      
+      
+      scene.add(screen2);
+      
       const screenPoints = [];
                   
       let screens = {
@@ -298,7 +311,7 @@
       screenGUI.add(currentSpec, 'angle', 0, Math.PI/2, 0.01).name('Sides Angle').onChange((value) => { setSpecProp('angle', value); });
       screenGUI.add(currentSpec, 'spacing', 0, 80, 0.01).name('Spacing').onChange((value) => { setSpecProp('spacing', value); });
       screenGUI.add(currentSpec, 'floorHeight', 0, 50, 0.01).name('Floor Height').onChange((value) => { setSpecProp('floorHeight', value); });
-      screenGUI.add(currentSpec, 'z', -40, 40, 0.01).name('Distance').onChange((value) => { setSpecProp('z', value); });
+      screenGUI.add(currentSpec, 'z', -60, 40, 0.01).name('Distance').onChange((value) => { setSpecProp('z', value); });
       screenGUI.add(currentSpec, 'centerOffset', -30, 20, 0.01).name('Center Offset').onChange((value) => { setSpecProp('centerOffset', value); });
       screenGUI.add(currentSpec, 'bezel', 0, 5, 0.01).name('Bezel').onChange((value) => { setSpecProp('bezel', value); });
       
@@ -524,6 +537,17 @@
         screen2.setSpec(currentSpec);
         screen3.setSpec(currentSpec);
         document.activeElement.blur();
+        
+        var target = new THREE.Vector3();
+        screen2.getWorldPosition(target);
+        hinge1.position.x = target.x + screen2.spec.width / 2;
+        hinge1.position.z = target.z;
+        hinge1.rotation.y = screen1.spec.angle * -1;        
+        
+        hinge2.position.x = target.x - screen2.spec.width / 2;
+        hinge2.position.z = target.z;                    
+        hinge2.rotation.y = screen3.spec.angle;
+        
         updateBoundsPoints();
         upDateScreenPoints();
       }
@@ -554,7 +578,7 @@
       
       function movePoint(point, x, y, z) {
         point.position.x = x;
-        point.position.y = y; 
+        point.position.y = y;
         point.position.z = z;
       }
       
@@ -596,14 +620,14 @@
         screen2.position.set(
           0,
           currentSpec.floorHeight,
-          currentSpec.z + currentSpec.centerOffset
+          currentSpec.z
         );
         
-        screen1.rotation.y = currentSpec.angle * -1;
-        screen3.rotation.y = currentSpec.angle;
-
-        screen1.position.set(currentSpec.spacing, currentSpec.floorHeight, currentSpec.z);
-        screen3.position.set(-currentSpec.spacing, currentSpec.floorHeight, currentSpec.z);   
+        screen1.position.set(currentSpec.width / 2, 0, 0);
+        screen3.position.set(-currentSpec.width / 2, 0, 0);   
+        
+        hinge1.position.set(currentSpec.spacing, 0, currentSpec.centerOffset);
+        hinge2.position.set(-currentSpec.spacing, 0, currentSpec.centerOffset);
         
         if(selectedPoint)
           selectedPoint.material.color.set(0xff0000);
