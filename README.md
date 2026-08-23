@@ -2,9 +2,7 @@
 
 The MUlti-SCreen Layout EDitor provides a 3D workspace to layout and assess the design of your multi-screen envrionment.
 
-Try it [here](https://muscled.glitch.me/)!
-
-![Screenshot](https://cdn.glitch.global/710b4225-853b-4ba5-bd3d-1a005f44407d/muscled.png)
+Try it [here](https://joegaffey.github.io/muscled/)!
 
 Rig model from [3table](https://github.com/joegaffey/3table).  
 Background images from:
