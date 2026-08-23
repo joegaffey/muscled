@@ -61,9 +61,9 @@
       import Screen from 'screen';
       // import { VRButton } from 'vrButton';
       
-      const RIG_X = 12;
+      const RIG_X = 0;
       const RIG_Y = 0;
-      const RIG_Z = 40;
+      const RIG_Z = 12;
       
       const DP_X = 0;
       const DP_Y = 25;
@@ -102,40 +102,40 @@
       
       const images = {
         'Project Cars 2': {
-          left: cdnPath + 'racing1.jpg',
-          middle: cdnPath + 'racing1.jpg',
-          right: cdnPath + 'racing1.jpg',
+          left: './assets/images/racing1.jpg',
+          middle: './assets/images/racing1.jpg',
+          right: './assets/images/racing1.jpg',
         },
-        'Project Cars': {
-          left: cdnPath + 'pcars.jpg',
-          middle: cdnPath + 'pcars.jpg',
-          right: cdnPath + 'pcars.jpg',
-        },
-        'iRacing': {
-          left: cdnPath + 'iracing.jpg',
-          middle: cdnPath + 'iracing.jpg',
-          right: cdnPath + 'iracing.jpg',
-        },
-        'Assetto Corsa': {
-          left: cdnPath + 'ac1.jpg',
-          middle: cdnPath + 'ac1.jpg',
-          right: cdnPath + 'ac1.jpg',
-        },
+        // 'Project Cars': {
+        //   left: cdnPath + 'pcars.jpg',
+        //   middle: cdnPath + 'pcars.jpg',
+        //   right: cdnPath + 'pcars.jpg',
+        // },
+        // 'iRacing': {
+        //   left: cdnPath + 'iracing.jpg',
+        //   middle: cdnPath + 'iracing.jpg',
+        //   right: cdnPath + 'iracing.jpg',
+        // },
+        // 'Assetto Corsa': {
+        //   left: cdnPath + 'ac1.jpg',
+        //   middle: cdnPath + 'ac1.jpg',
+        //   right: cdnPath + 'ac1.jpg',
+        // },
         'RFactor 2': {
-          left: cdnPath + 'rfactor2_1.jpg',
-          middle: cdnPath + 'rfactor2_1.jpg',
-          right: cdnPath + 'rfactor2_1.jpg',
+          left: './assets/images/rfactor2_1.jpg',
+          middle: './assets/images/rfactor2_1.jpg',
+          right: './assets/images/rfactor2_1.jpg',
         },
-        'Dirt Rally (Cockpit)': {
-          left: cdnPath + 'dirtrally_cockpit4.jpg',
-          middle: cdnPath + 'dirtrally_cockpit4.jpg',
-          right: cdnPath + 'dirtrally_cockpit4.jpg',
-        },
-        'Dirt Rally (Bonnet)': {
-          left: cdnPath + 'dirtrally_g44.jpg',
-          middle: cdnPath + 'dirtrally_g44.jpg',
-          right: cdnPath + 'dirtrally_g44.jpg',
-        },
+        // 'Dirt Rally (Cockpit)': {
+        //   left: cdnPath + 'dirtrally_cockpit4.jpg',
+        //   middle: cdnPath + 'dirtrally_cockpit4.jpg',
+        //   right: cdnPath + 'dirtrally_cockpit4.jpg',
+        // },
+        // 'Dirt Rally (Bonnet)': {
+        //   left: cdnPath + 'dirtrally_g44.jpg',
+        //   middle: cdnPath + 'dirtrally_g44.jpg',
+        //   right: cdnPath + 'dirtrally_g44.jpg',
+        // },
       };
             
       const plColor = 0xffff00;
@@ -368,8 +368,7 @@
         (geometry) => {
           setTimeout(() => { endLoad(); }, 1000);
           rig = new THREE.Mesh(geometry, plasticMaterial);
-          rig.rotation.x = -Math.PI / 2;
-          rig.rotation.z = Math.PI / 2;
+          rig.scale.setScalar(0.03);
           rig.position.x = RIG_X;
           rig.position.y = RIG_Y;
           rig.position.z = RIG_Z;
